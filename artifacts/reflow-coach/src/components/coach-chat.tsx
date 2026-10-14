@@ -14,13 +14,12 @@ type ChatMessage = {
   role: ChatRole;
   content: string;
   includeInHistory?: boolean;
-  proposal?: PlanProposal;
-  proposalStatus?: 'accepted' | 'kept';
+  planUpdate?: PlanProposal;
 };
 
 type ChatEvent =
   | { type: 'delta'; content: string }
-  | { type: 'proposal'; proposal: unknown }
+  | { type: 'plan_update'; update: unknown }
   | { type: 'error'; message: string }
   | { type: 'done' };
 
@@ -52,25 +51,12 @@ function readEvent(block: string): ChatEvent | null {
   }
 }
 
-function ProposalCard({
-  message,
-  onChoose,
-  week,
-}: {
-  message: ChatMessage;
-  onChoose: (accepted: boolean) => void;
-  week: Session[];
-}) {
-  const proposal = message.proposal;
-  if (!proposal) return null;
-  const revisedWeek = applyPlanProposal(week, proposal);
-  const decided = Boolean(message.proposalStatus);
-
+function PlanUpdateCard({ update }: { update: PlanProposal }) {
   return (
-    <div className="plan-proposal" data-testid="ai-plan-proposal">
-      <div className="proposal-heading"><Sparkles size={14} /> POSSIBLE WEEK CHANGE</div>
+    <div className="plan-update" data-testid="ai-plan-update">
+      <div className="plan-update-heading"><Check size={14} /> WEEK UPDATED</div>
       <div className="proposal-changes">
-        {proposal.changes.map((change) => (
+        {update.changes.map((change) => (
           <div className="proposal-change" key={change.sessionId}>
             <span className="proposal-day">{change.day.slice(0, 3).toUpperCase()}</span>
             <span className="proposal-session">{change.title}<small>{change.detail}</small></span>
@@ -78,36 +64,8 @@ function ProposalCard({
           </div>
         ))}
       </div>
-      <p className="proposal-impact">{proposal.impact}</p>
-      {decided ? (
-        <div className="proposal-result" role="status">
-          <Check size={14} />
-          {message.proposalStatus === 'accepted' ? 'Applied to the sample week above.' : 'Kept your week as it was.'}
-        </div>
-      ) : (
-        <div className="proposal-actions">
-          <button
-            type="button"
-            className="accept-button"
-            onClick={() => onChoose(true)}
-            disabled={!revisedWeek}
-            data-testid="button-accept-proposal"
-          >
-            <Check size={14} /> Apply to sample week
-          </button>
-          <button
-            type="button"
-            className="reject-button"
-            onClick={() => onChoose(false)}
-            data-testid="button-reject-proposal"
-          >
-            Keep my week
-          </button>
-        </div>
-      )}
-      {!decided && !revisedWeek && (
-        <p className="proposal-warning" role="alert">This conflicts with the current schedule, so it can’t be applied. Ask the coach to reconsider it.</p>
-      )}
+      <p className="plan-update-impact">{update.impact}</p>
+      <div className="plan-update-result" role="status">Applied to Week at a glance after you agreed.</div>
     </div>
   );
 }
@@ -174,6 +132,7 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
       let buffer = '';
       let streamError: string | null = null;
       let finished = false;
+      let pendingPlanUpdate: PlanProposal | null = null;
 
       const processBlock = (block: string) => {
         const chatEvent = readEvent(block);
@@ -182,11 +141,8 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
           setMessages((current) => current.map((item) =>
             item.id === assistantId ? { ...item, content: item.content + chatEvent.content } : item,
           ));
-        } else if (chatEvent.type === 'proposal' && isPlanProposal(chatEvent.proposal)) {
-          const proposal = chatEvent.proposal;
-          setMessages((current) => current.map((item) =>
-            item.id === assistantId ? { ...item, proposal } : item,
-          ));
+        } else if (chatEvent.type === 'plan_update' && isPlanProposal(chatEvent.update)) {
+          pendingPlanUpdate = chatEvent.update;
         } else if (chatEvent.type === 'error') {
           streamError = chatEvent.message;
         } else if (chatEvent.type === 'done') {
@@ -208,14 +164,21 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
       if (streamError) throw new Error(streamError);
       if (!finished) throw new Error('The connection ended before the coach replied. Your week has not changed.');
 
+      if (pendingPlanUpdate) {
+        const revisedWeek = applyPlanProposal(week, pendingPlanUpdate);
+        if (!revisedWeek) throw new Error('That agreed change no longer fits the current week. The week has not changed.');
+        setWeek(revisedWeek);
+      }
+
       setDraft('');
       setMessages((current) => current.map((item) =>
         item.id === assistantId
           ? {
               ...item,
-              content: item.content || (item.proposal
-                ? 'I’ve outlined a possible adjustment below. Take a look at the impact and decide whether it fits.'
+              content: item.content || (pendingPlanUpdate
+                ? 'Done—we updated Week at a glance with the change we agreed on.'
                 : 'I wasn’t able to put together a useful reply just now. Your plan hasn’t changed.'),
+              planUpdate: pendingPlanUpdate ?? undefined,
               includeInHistory: true,
             }
           : item,
@@ -231,29 +194,6 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
       setIsThinking(false);
       textareaRef.current?.focus();
     }
-  };
-
-  const decideProposal = (messageId: string, proposal: PlanProposal, accepted: boolean) => {
-    const decision: ChatMessage['proposalStatus'] = accepted ? 'accepted' : 'kept';
-    if (accepted) {
-      const revisedWeek = applyPlanProposal(week, proposal);
-      if (!revisedWeek) {
-        setError('The proposed change no longer fits the current week. No changes were made.');
-        return;
-      }
-      setWeek(revisedWeek);
-    }
-    setMessages((current) => [
-      ...current.map((item) =>
-        item.id === messageId ? { ...item, proposalStatus: decision } : item,
-      ),
-      {
-        id: `user-${nextId.current++}`,
-        role: 'user',
-        content: accepted ? 'I applied that change to the sample week.' : 'I kept my original week instead.',
-        includeInHistory: true,
-      },
-    ]);
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -287,11 +227,7 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
             <div className="message-content">
               <span className="message-sender">{message.role === 'user' ? 'YOU' : 'REFLOW'}</span>
               {message.content ? <p>{message.content}</p> : <span className="thinking-indicator"><LoaderCircle size={16} /> Thinking through your week…</span>}
-              {message.proposal && <ProposalCard
-                message={message}
-                week={week}
-                onChoose={(accepted) => decideProposal(message.id, message.proposal!, accepted)}
-              />}
+              {message.planUpdate && <PlanUpdateCard update={message.planUpdate} />}
             </div>
           </article>
         ))}

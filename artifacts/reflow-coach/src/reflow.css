@@ -108,19 +108,16 @@
 .chat-send-button:hover:not(:disabled) { background: #244a3e; }
 .chat-send-button:disabled { opacity: .4; cursor: not-allowed; }
 .chat-error { margin: 7px 4px 0; color: #ac473e; font-size: 10px; line-height: 1.45; }
-.plan-proposal { margin-top: 11px; padding: 10px; border: 1px solid #e4dfd1; border-radius: 9px; background: #fbfaf4; }
-.proposal-heading { display: flex; align-items: center; gap: 6px; color: #ae6e43; font: 500 8px var(--app-font-mono); letter-spacing: .08em; }
+.plan-update { margin-top: 11px; padding: 10px; border: 1px solid #d9e3d9; border-radius: 9px; background: #f8faf4; }
+.plan-update-heading { display: flex; align-items: center; gap: 6px; color: #547157; font: 500 8px var(--app-font-mono); letter-spacing: .08em; }
 .proposal-changes { display: grid; gap: 5px; margin-top: 8px; }
 .proposal-change { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; align-items: center; gap: 7px; padding: 7px; border-radius: 6px; background: #f4f3eb; }
 .proposal-day { color: #89948a; font: 500 8px var(--app-font-mono); }
 .proposal-session { min-width: 0; color: #455d4e; font-size: 9px; font-weight: 700; }
 .proposal-session small { display: block; margin-top: 2px; color: #90988e; font-size: 8px; font-weight: 400; }
 .proposal-time { color: #9a7557; font: 400 8px var(--app-font-mono); text-align: right; }
-.proposal-impact { margin: 8px 0 0; color: #69776c; font-size: 9px; line-height: 1.5; }
-.proposal-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
-.proposal-actions .accept-button, .proposal-actions .reject-button { min-height: 30px; font-size: 9px; }
-.proposal-result { display: flex; align-items: center; gap: 5px; margin-top: 8px; color: #547157; font-size: 9px; }
-.proposal-warning { margin: 7px 0 0; color: #a64d3d; font-size: 9px; line-height: 1.4; }
+.plan-update-impact { margin: 8px 0 0; color: #69776c; font-size: 9px; line-height: 1.5; }
+.plan-update-result { margin-top: 8px; color: #547157; font-size: 9px; }
 .coach-prompt { margin: 0 0 14px; color: #53675b; font-size: 13px; line-height: 1.5; }
 .example-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
 .example-chip { display: inline-flex; align-items: center; gap: 3px; min-height: 29px; padding: 5px 8px; border: 1px solid #e3e4d9; border-radius: 7px; background: #f6f6ef; color: #718076; font-size: 9px; text-align: left; transition: border-color .16s, color .16s, background .16s; }
