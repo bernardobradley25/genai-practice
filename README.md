@@ -21,16 +21,13 @@ This prototype uses live AI, so responses can be inconsistent or wrong. Model us
 
 ## Test results
 
-Live API checks cover the missed-run/soccer comparison, a follow-up with activity details and proactive options, Reflow confirmation, an adapted travel week with Surf, a separate soccer challenge, and an empty request. Separate automated checks cover plan-edit validation. They show the interaction works, not that the coaching is correct or useful to athletes.
+I tested the user-facing flow in Replit with three scenarios. These results describe whether the experience worked for me; they do not establish that the coaching recommendations are correct.
 
 | Test | Input or action | What happened | Result |
 | --- | --- | --- | --- |
-| Default comparison | Reported missing Tuesday's 35-minute easy run and playing 90 minutes of soccer without describing effort; then clarified that most of it was active, fairly hard, and stop-start. | The AI asked for activity details before assigning an impact rating. After clarification it compared overall load with easy-run stimulus, listed all remaining run/sport days, and offered no-make-up, partial-session, and existing-run options without waiting to be asked. It did not edit the plan. | Pass |
-| Reflow confirmation | Said “I like this plan” after the coach asked whether a specific recommendation worked; also tried a “what if” alternative. | The positive agreement returned a validated `reflow_ready` event; the hypothetical returned no Reflow event. The client stages the button and updates the week only in its click handler. | Pass |
-| Travel-week Reflow | Approved an adapted week with running, Surf, and bodyweight-only strength. | The API returned a validated five-session Reflow with Surf represented separately; the week remains unchanged until the button is clicked. | Pass |
-| Challenge case | Described an 80-minute soccer match with hard sprints and walking, with uncertain overall intensity. | The AI treated soccer as a separate field load rather than an equivalent run and discussed uncertainty about the remaining week. | Pass |
-| Invalid or empty case | Sent an empty chat body to the API. | The API returned 400 without calling the model. The chat send control is also disabled for an empty message. | Pass |
-| Plan validation | Ran the scheduling logic with an allowed pending change, an overlapping session, an unknown session, and a completed workout. | The allowed change produces a revised week when committed; invalid or conflicting changes are blocked. | Pass |
+| Typical case | I missed Tuesday's run but completed a 90-minute soccer match. I also tried a more complex run/soccer schedule change, including running Wednesday instead of the planned soccer session. | Reflow updated the week consistently. The cards reflected the changed schedule, and the “Reflow the week” button applied the proposed changes. | Pass |
+| Challenge case | I planned ahead for a week of travel with no usual runs, workouts, or soccer. I could surf, do bodyweight strength, and possibly swim; I answered the coach's questions and chose how many days to surf. | Reflow asked follow-up questions about the available activities and schedule, then built a plan around my answers. It considered how to limit the loss of aerobic and anaerobic training stimulus and the overall effect on the week. | Pass |
+| Invalid or empty case | I submitted a blank chat message. | The app did not accept or send the blank input, so no response was generated. | Pass |
 
 Run the automated plan checks and typecheck with:
 
@@ -42,7 +39,7 @@ pnpm --filter @workspace/reflow-coach run typecheck
 ## Known limitations
 
 - The plan is a single fictional week and there are no accounts or saved plans; conversation and changes are lost when the app is reset or reloaded.
-- The model has no reviewed training-reference set, and no athlete testing has established that its suggestions are accurate or useful.
+- The model has no reviewed training-reference set, and broader athlete testing has not established that its suggestions are accurate or useful.
 - This prototype does not assess injuries, rehabilitation, medical conditions, or detailed recovery data; do not use it for those decisions.
 
 ## Safety and scope
