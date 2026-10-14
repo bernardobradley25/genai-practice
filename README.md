@@ -10,7 +10,7 @@ The plan appears as cards in “This week, at a glance.” The coach can prepare
 
 ## How to use the MVP
 
-1. Open the Reflow Training Coach preview at the project root (`/`). The screen shows the sample week and the Reflow chat.
+1. Open the [live Reflow Training Coach](https://reflow-training-coach.replit.app). The screen shows the sample week and the Reflow chat.
 2. Tell Reflow what changed or what you are planning. For example: “I missed Tuesday’s run but played soccer for 90 minutes,” or “I’ll be traveling next week and can surf, swim, and do bodyweight strength.”
 3. Answer Reflow’s follow-up questions about effort, timing, and what activities or equipment are available. You can discuss alternatives and ask how each option may affect the rest of the week.
 4. Review the specific weekly plan Reflow recommends. Exploring a “what if” does not update the schedule.
