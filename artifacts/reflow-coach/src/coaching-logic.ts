@@ -9,7 +9,19 @@ export type Session = {
   status: 'planned' | 'done' | 'moved' | 'missed' | 'rest';
 };
 
-export type CaseType = 'missed' | 'soccer' | 'makeup' | 'unknown';
+export type PlanChange = {
+  sessionId: string;
+  day: string;
+  time: string;
+  title: string;
+  detail: string;
+  status: string;
+};
+
+export type PlanProposal = {
+  impact: string;
+  changes: PlanChange[];
+};
 
 export const initialWeek: Session[] = [
   { id: 'mon', day: 'Monday', shortDay: 'MON', sport: 'Strength', title: 'Full-body strength', detail: '45 min · moderate', time: '6:30 PM', status: 'done' },
@@ -21,28 +33,59 @@ export const initialWeek: Session[] = [
   { id: 'sun', day: 'Sunday', shortDay: 'SUN', sport: 'Run', title: 'Recovery buffer', detail: 'Unplanned space', time: 'Open', status: 'rest' },
 ];
 
-export function classifyRequest(value: string): CaseType | 'empty' {
-  if (!value.trim()) return 'empty';
-  const text = value.toLowerCase();
-  if (/(make up|make-up|every missed|all missed|missed two|missed all)/.test(text)) return 'makeup';
-  if (/(soccer|football|club training|game replaced|match replaced)/.test(text)) return 'soccer';
-  if (/(missed|skip|couldn't|could not|free recovery|move.*run|easy run)/.test(text)) return 'missed';
-  return 'unknown';
+const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const editableStatuses = ['planned', 'moved', 'missed', 'rest'];
+
+export function isPlanProposal(value: unknown): value is PlanProposal {
+  if (!value || typeof value !== 'object') return false;
+  const proposal = value as Record<string, unknown>;
+  if (typeof proposal.impact !== 'string' || proposal.impact.length > 700) return false;
+  if (!Array.isArray(proposal.changes) || proposal.changes.length < 1 || proposal.changes.length > 3) return false;
+  return proposal.changes.every((rawChange) => {
+    if (!rawChange || typeof rawChange !== 'object') return false;
+    const change = rawChange as Record<string, unknown>;
+    return typeof change.sessionId === 'string'
+      && typeof change.day === 'string'
+      && days.includes(change.day)
+      && typeof change.time === 'string'
+      && change.time.length <= 40
+      && typeof change.title === 'string'
+      && change.title.length <= 80
+      && typeof change.detail === 'string'
+      && change.detail.length <= 120
+      && typeof change.status === 'string'
+      && editableStatuses.includes(change.status);
+  });
 }
 
-export function validateSoccerDetails(duration: string, intensity: string): string | null {
-  const minutes = Number(duration);
-  if (!duration || !Number.isFinite(minutes) || minutes < 1 || minutes > 240) {
-    return 'Please enter time on the field between 1 and 240 minutes.';
-  }
-  if (!intensity) return 'Please choose how hard it felt overall.';
-  return null;
-}
+export function applyPlanProposal(sessions: Session[], value: unknown): Session[] | null {
+  if (!isPlanProposal(value)) return null;
+  const proposal = value;
+  const ids = new Set(proposal.changes.map((change) => change.sessionId));
+  if (ids.size !== proposal.changes.length) return null;
 
-export function applyMissedRunMove(sessions: Session[]): Session[] {
-  return sessions.map((session) => session.id === 'tue'
-    ? { ...session, status: 'missed', detail: 'Moved to Thu · 6:30 PM', time: 'Not completed' }
-    : session.id === 'thu'
-      ? { ...session, status: 'moved', title: 'Easy run (moved)', detail: '35 min · conversational', time: '6:30 PM' }
-      : session);
+  const updated = sessions.map((session) => {
+    const change = proposal.changes.find((item) => item.sessionId === session.id);
+    if (!change) return session;
+    if (session.status === 'done') return null;
+    return {
+      ...session,
+      day: change.day,
+      shortDay: change.day.slice(0, 3).toUpperCase(),
+      time: change.time,
+      title: change.title,
+      detail: change.detail,
+      status: change.status as Session['status'],
+    };
+  });
+  if (updated.some((session) => session === null)) return null;
+
+  const nextWeek = updated as Session[];
+  const activeRunFieldDays = nextWeek
+    .filter((session) => ['Run', 'Soccer'].includes(session.sport) && !['missed', 'rest'].includes(session.status))
+    .map((session) => session.day);
+  if (activeRunFieldDays.length > 5 || new Set(activeRunFieldDays).size !== activeRunFieldDays.length) return null;
+  if (proposal.changes.some((change) => !sessions.some((session) => session.id === change.sessionId))) return null;
+
+  return nextWeek;
 }

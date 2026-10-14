@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: reflow
+    description: Reflow AI coaching conversation
 paths:
   /healthz:
     get:
@@ -24,6 +26,37 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /reflow/chat:
+    post:
+      operationId: reflowChat
+      tags: [reflow]
+      summary: Continue a Reflow coaching conversation
+      description: Streams a model response and an optional user-reviewable plan proposal.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReflowChatInput"
+      responses:
+        "200":
+          description: Server-sent events containing message deltas and an optional proposal.
+          content:
+            text/event-stream:
+              schema:
+                type: string
+        "400":
+          description: The conversation or training week is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: The AI service could not complete the response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +66,65 @@ components:
           type: string
       required:
         - status
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+    ReflowChatMessage:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+          minLength: 1
+          maxLength: 3000
+      required: [role, content]
+    ReflowPlanSession:
+      type: object
+      properties:
+        id:
+          type: string
+          enum: [mon, tue, wed, thu, fri, sat, sun]
+        day:
+          type: string
+          maxLength: 24
+        shortDay:
+          type: string
+          maxLength: 3
+        sport:
+          type: string
+          enum: [Run, Soccer, Strength]
+        title:
+          type: string
+          maxLength: 80
+        detail:
+          type: string
+          maxLength: 120
+        time:
+          type: string
+          maxLength: 40
+        status:
+          type: string
+          enum: [planned, done, moved, missed, rest]
+      required: [id, day, shortDay, sport, title, detail, time, status]
+    ReflowChatInput:
+      type: object
+      properties:
+        messages:
+          type: array
+          minItems: 1
+          maxItems: 24
+          items:
+            $ref: "#/components/schemas/ReflowChatMessage"
+        week:
+          type: array
+          minItems: 1
+          maxItems: 7
+          items:
+            $ref: "#/components/schemas/ReflowPlanSession"
+      required: [messages, week]
 

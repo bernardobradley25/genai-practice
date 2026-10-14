@@ -1,7 +1,7 @@
 kind = "web"
 previewPath = "/"
 title = "Reflow Training Coach"
-description = "A focused prototype for adult amateur athletes balancing running, recreational sport, and strength training. Users can describe a change to their week, review a simulated whole-routine coaching suggestion, and accept or reject it."
+description = "A live AI chat for adult amateur athletes balancing endurance, recreational sport, and strength. Athletes discuss changes across a fictional sample week, receive conversational impact guidance, and review optional plan edits before applying them."
 version = "1.0.0"
 id = "artifacts/reflow-coach"
 router = "path"

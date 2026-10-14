@@ -4,43 +4,45 @@ Reflow is a prototype coaching experience for adult amateur athletes balancing r
 
 ## First working slice
 
-Open the Reflow Training Coach preview at the project root (`/`). The sample athlete can describe a schedule change, review a prewritten suggestion, and decide whether to apply it. Try the three example prompts to explore a missed run, soccer replacing a run, and a request to make up every missed session.
+Open the Reflow Training Coach preview at the project root (`/`). The fictional athlete can talk with Reflow in their own words about a change, ask follow-up questions, and discuss how it might affect the whole week. If the athlete asks for a specific schedule change, Reflow can show an optional proposal; the plan changes only after the athlete accepts it. The API and plan checks preserve the five run/field-day limit and block conflicting run/field sessions.
 
-For local development from this repository:
+The chat is session-only: reloading or starting a new chat clears the conversation, and the sample week resets when the page reloads. Run the API and web workflows together during development:
 
 ```sh
-PORT=5173 BASE_PATH=/ pnpm --filter @workspace/reflow-coach run dev
+pnpm --filter @workspace/api-server run dev
+PORT=20368 BASE_PATH=/ pnpm --filter @workspace/reflow-coach run dev
 ```
 
 ## AI behavior
 
-The future AI coach is intended to ask follow-up questions, consider the athlete’s whole week and availability, explain trade-offs and uncertainty, and propose changes for the athlete to review.
+The AI coach uses Replit’s managed OpenAI integration to discuss changes in natural language, consider the current week and its constraints, ask for important missing context, and explain likely effects and trade-offs. When the athlete explicitly wants a schedule edit, the model may return a structured proposal for review. The API validates that proposal; only the athlete’s acceptance updates the sample week.
 
-In this prototype, responses are simulated. A small keyword matcher selects prewritten replies; there is no live AI model, database, or saved user data. The soccer example asks for duration and perceived effort before showing its response. It does not treat soccer as an equivalent run. All changes remain under the athlete’s control.
+This prototype uses live AI, so responses can be inconsistent or wrong. Model use is billed through Replit credits. Messages go to Replit’s managed AI service but are not saved by this prototype. No reviewed training references are connected; Reflow must not be treated as medical, injury, or rehabilitation guidance. Use only the fictional profile and do not enter identifying or medical details.
 
-## Quick test results
+## Test results
 
-These checks cover the deterministic scenario logic used by the prototype. They are not a validation of coaching quality or training outcomes.
+Three live API checks cover a typical multi-turn conversation, a soccer challenge, and an empty request. Separate automated checks cover plan-edit validation. They show the interaction works, not that the coaching is correct or useful to athletes.
 
 | Test | Input or action | What happened | Result |
 | --- | --- | --- | --- |
-| Typical case | “I missed Tuesday’s easy run. I have a free recovery slot Thursday evening.” | The scenario produces a Thursday 6:30 PM easy-run move, marks Tuesday as missed, and leaves the original sample unchanged until acceptance. | Pass |
-| Challenge case | “Soccer replaced my Thursday run.” | The flow asks for time on the field and perceived effort; it does not infer that soccer replaces the run. | Pass |
-| Invalid or empty case | Submit blank input, or enter `0` minutes for soccer. | Blank input stays in the starting flow with a prompt; invalid duration is rejected. | Pass |
-| Constraint pushback | “I missed two sessions and want to make up every one this week.” | The scenario routes to a prewritten explanation that there is no compatible extra slot and offers two choices without adding sessions. | Pass |
+| Typical case | Asked about a missed Tuesday easy run, an open Thursday evening, and an already-planned Thursday steady run. Then discussed the trade-off before asking for a proposal. | The AI explained the double-run conflict, continued from prior chat context, and returned a proposal that replaces the steady run; it did not edit the week automatically. | Pass |
+| Challenge case | Described an 80-minute soccer match with hard sprints and walking, with uncertain overall intensity. | The AI treated soccer as a separate field load rather than an equivalent run and discussed uncertainty about the remaining week. | Pass |
+| Invalid or empty case | Sent an empty chat body to the API. | The API returned 400 without calling the model. The chat send control is also disabled for an empty message. | Pass |
+| Plan controls | Applied an allowed proposal and tried overlapping sessions, an unknown session, and editing a completed session. | The allowed proposal updates the sample week; invalid or conflicting proposals are blocked. | Pass |
 
-Run the checks with:
+Run the automated plan checks and typecheck with:
 
 ```sh
 pnpm --filter @workspace/reflow-coach run test:logic
+pnpm --filter @workspace/reflow-coach run typecheck
 ```
 
 ## Known limitations
 
-- Responses use keyword matching and fixed text, so natural-language understanding, clarifying dialogue, and recommendations are not powered by AI.
-- The plan is a single fictional sample week; changes reset when the page reloads, and there are no personal accounts or saved plans.
-- Training suggestions have not been reviewed or medically validated. The prototype does not evaluate injuries, recovery data, or evidence-based training references.
+- The plan is a single fictional week and there are no accounts or saved plans; conversation and changes are lost when the app is reset or reloaded.
+- The model has no reviewed training-reference set, and no athlete testing has established that its suggestions are accurate or useful.
+- This prototype does not assess injuries, rehabilitation, medical conditions, or detailed recovery data; do not use it for those decisions.
 
 ## Safety and scope
 
-The sample athlete is fictional. Coach replies are labeled as simulated, and this prototype is a planning exercise—not medical, injury, rehabilitation, or nutrition guidance.
+The sample athlete is fictional. AI responses are generated live and may be wrong; the athlete reviews every proposed plan change. This prototype does not store conversation history and is not medical, injury, rehabilitation, or nutrition guidance.
