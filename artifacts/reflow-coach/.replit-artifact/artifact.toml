@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Reflow Training Coach"
+description = "A focused prototype for adult amateur athletes balancing running, recreational sport, and strength training. Users can describe a change to their week, review a simulated whole-routine coaching suggestion, and accept or reject it."
+version = "1.0.0"
+id = "artifacts/reflow-coach"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20368
+
+[services.development]
+run = "pnpm --filter @workspace/reflow-coach run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/reflow-coach", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/reflow-coach/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20368"
+BASE_PATH = "/"
