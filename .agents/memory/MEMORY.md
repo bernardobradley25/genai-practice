@@ -1,1 +1,2 @@
 - [Reflow commit flow](reflow-commit-flow.md) — agreeing with a recommendation stages a change; only clicking “Reflow the week” applies it.
+- [GitHub source-control access](github-source-control-access.md) — an active account connection may not provide usable Git CLI write access; verify the target remote before relying on it.
