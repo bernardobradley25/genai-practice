@@ -149,7 +149,6 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
       userMessage,
       { id: assistantId, role: 'assistant', content: '', includeInHistory: false },
     ]);
-    setDraft('');
     setIsThinking(true);
     setError('');
 
@@ -173,7 +172,7 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
-      let hasError = false;
+      let streamError: string | null = null;
       let finished = false;
 
       const processBlock = (block: string) => {
@@ -189,8 +188,7 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
             item.id === assistantId ? { ...item, proposal } : item,
           ));
         } else if (chatEvent.type === 'error') {
-          hasError = true;
-          setError(chatEvent.message);
+          streamError = chatEvent.message;
         } else if (chatEvent.type === 'done') {
           finished = true;
         }
@@ -207,22 +205,28 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
       if (buffer.trim()) processBlock(buffer);
       await reader.cancel().catch(() => undefined);
 
+      if (streamError) throw new Error(streamError);
+      if (!finished) throw new Error('The connection ended before the coach replied. Your week has not changed.');
+
+      setDraft('');
       setMessages((current) => current.map((item) =>
         item.id === assistantId
           ? {
               ...item,
               content: item.content || (item.proposal
                 ? 'I’ve outlined a possible adjustment below. Take a look at the impact and decide whether it fits.'
-                : hasError ? item.content : 'I wasn’t able to put together a useful reply just now. Your plan hasn’t changed.'),
-              includeInHistory: !hasError,
+                : 'I wasn’t able to put together a useful reply just now. Your plan hasn’t changed.'),
+              includeInHistory: true,
             }
           : item,
       ));
     } catch (sendError) {
-      setError(sendError instanceof Error ? sendError.message : 'Something went wrong. Your week has not changed.');
-      setMessages((current) => current.map((item) =>
-        item.id === assistantId ? { ...item, content: 'I couldn’t reach the coach just now. Your plan hasn’t changed.', includeInHistory: false } : item,
-      ));
+      const message = sendError instanceof Error ? sendError.message : 'Something went wrong. Your week has not changed.';
+      setError(message === 'Failed to fetch'
+        ? 'Couldn’t connect to the coach. Your message is still in the box, and your week hasn’t changed. Try again when the connection is back.'
+        : message);
+      setDraft(content);
+      setMessages((current) => current.filter((item) => item.id !== userMessage.id && item.id !== assistantId));
     } finally {
       setIsThinking(false);
       textareaRef.current?.focus();
