@@ -18,7 +18,7 @@ export interface ReflowPlanSession {
   sport: ReflowPlanSessionSport;
   /** @maxLength 80 */
   title: string;
-  /** @maxLength 120 */
+  /** @maxLength 300 */
   detail: string;
   /** @maxLength 40 */
   time: string;

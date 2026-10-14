@@ -8,11 +8,12 @@ import NotFound from '@/pages/not-found';
 import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 import { initialWeek, type Session } from './coaching-logic';
 import { CoachChat } from './components/coach-chat';
-import { Activity, CalendarDays, Check, Clock3, Dumbbell, Footprints, Info, RotateCcw } from 'lucide-react';
+import { Activity, CalendarDays, Check, Clock3, Dumbbell, Footprints, Info, RotateCcw, Waves } from 'lucide-react';
 
 function sportIcon(sport: Session['sport']) {
   if (sport === 'Run') return <Footprints size={16} strokeWidth={1.8} />;
   if (sport === 'Soccer') return <Activity size={16} strokeWidth={1.8} />;
+  if (sport === 'Surf') return <Waves size={16} strokeWidth={1.8} />;
   return <Dumbbell size={16} strokeWidth={1.8} />;
 }
 
@@ -29,6 +30,7 @@ function App() {
   const dayCount = activeSessions.filter((session) => session.sport !== 'Strength').length;
   const runCount = activeSessions.filter((session) => session.sport === 'Run').length;
   const soccerCount = activeSessions.filter((session) => session.sport === 'Soccer').length;
+  const surfCount = activeSessions.filter((session) => session.sport === 'Surf').length;
   const strengthCount = activeSessions.filter((session) => session.sport === 'Strength').length;
 
   return (
@@ -71,12 +73,12 @@ function App() {
                 <div className="section-kicker"><CalendarDays size={14} /> THE WHOLE ROUTINE</div>
                 <h2 className="display" id="week-heading">This week, at a glance</h2>
               </div>
-              <div className="load-indicator"><span className="load-number">{dayCount}<small> / 5</small></span><span className="load-caption">run + field days</span></div>
+              <div className="load-indicator"><span className="load-number">{dayCount}<small> / 5</small></span><span className="load-caption">run + sport days</span></div>
             </div>
             <div className="constraint-strip" data-testid="athlete-constraints">
               <span><i>GOAL</i> 10K · comfortable finish</span>
               <span><i>OPEN</i> Thu evening</span>
-              <span><i>CAP</i> 5 run / field days</span>
+              <span><i>CAP</i> 5 run / sport days</span>
             </div>
             <div className="week-grid" data-testid="week-plan">
               {week.map((session) => (
@@ -105,9 +107,10 @@ function App() {
               <div className="legend">
                 <span><i className="legend-dot run-dot" /> Run</span>
                 <span><i className="legend-dot soccer-dot" /> Soccer</span>
+                <span><i className="legend-dot surf-dot" /> Surf</span>
                 <span><i className="legend-dot strength-dot" /> Strength</span>
               </div>
-              <span className="plan-note">{runCount} runs · {soccerCount} soccer · {strengthCount} strength</span>
+              <span className="plan-note">{runCount} runs · {soccerCount} soccer · {surfCount} surf · {strengthCount} strength</span>
             </div>
           </section>
 

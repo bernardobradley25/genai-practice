@@ -49,6 +49,7 @@ export type ReflowPlanSessionSport = typeof ReflowPlanSessionSport[keyof typeof 
 export const ReflowPlanSessionSport = {
   Run: 'Run',
   Soccer: 'Soccer',
+  Surf: 'Surf',
   Strength: 'Strength',
 } as const;
 
@@ -72,7 +73,7 @@ export interface ReflowPlanSession {
   sport: ReflowPlanSessionSport;
   /** @maxLength 80 */
   title: string;
-  /** @maxLength 120 */
+  /** @maxLength 300 */
   detail: string;
   /** @maxLength 40 */
   time: string;

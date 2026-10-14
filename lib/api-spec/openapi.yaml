@@ -97,13 +97,13 @@ components:
           maxLength: 3
         sport:
           type: string
-          enum: [Run, Soccer, Strength]
+          enum: [Run, Soccer, Surf, Strength]
         title:
           type: string
           maxLength: 80
         detail:
           type: string
-          maxLength: 120
+          maxLength: 300
         time:
           type: string
           maxLength: 40

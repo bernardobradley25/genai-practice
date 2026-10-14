@@ -2,7 +2,7 @@ export type Session = {
   id: string;
   day: string;
   shortDay: string;
-  sport: 'Run' | 'Soccer' | 'Strength';
+  sport: 'Run' | 'Soccer' | 'Surf' | 'Strength';
   title: string;
   detail: string;
   time: string;
@@ -11,6 +11,7 @@ export type Session = {
 
 export type PlanChange = {
   sessionId: string;
+  sport: Session['sport'];
   day: string;
   time: string;
   title: string;
@@ -40,11 +41,13 @@ export function isPlanProposal(value: unknown): value is PlanProposal {
   if (!value || typeof value !== 'object') return false;
   const proposal = value as Record<string, unknown>;
   if (typeof proposal.impact !== 'string' || proposal.impact.length > 700) return false;
-  if (!Array.isArray(proposal.changes) || proposal.changes.length < 1 || proposal.changes.length > 3) return false;
+  if (!Array.isArray(proposal.changes) || proposal.changes.length < 1 || proposal.changes.length > 7) return false;
   return proposal.changes.every((rawChange) => {
     if (!rawChange || typeof rawChange !== 'object') return false;
     const change = rawChange as Record<string, unknown>;
     return typeof change.sessionId === 'string'
+      && typeof change.sport === 'string'
+      && ['Run', 'Soccer', 'Surf', 'Strength'].includes(change.sport)
       && typeof change.day === 'string'
       && days.includes(change.day)
       && typeof change.time === 'string'
@@ -52,7 +55,7 @@ export function isPlanProposal(value: unknown): value is PlanProposal {
       && typeof change.title === 'string'
       && change.title.length <= 80
       && typeof change.detail === 'string'
-      && change.detail.length <= 120
+      && change.detail.length <= 300
       && typeof change.status === 'string'
       && editableStatuses.includes(change.status);
   });
@@ -70,6 +73,7 @@ export function applyPlanProposal(sessions: Session[], value: unknown): Session[
     if (session.status === 'done') return null;
     return {
       ...session,
+      sport: change.sport,
       day: change.day,
       shortDay: change.day.slice(0, 3).toUpperCase(),
       time: change.time,
@@ -82,7 +86,7 @@ export function applyPlanProposal(sessions: Session[], value: unknown): Session[
 
   const nextWeek = updated as Session[];
   const activeRunFieldDays = nextWeek
-    .filter((session) => ['Run', 'Soccer'].includes(session.sport) && !['missed', 'rest'].includes(session.status))
+    .filter((session) => ['Run', 'Soccer', 'Surf'].includes(session.sport) && !['missed', 'rest'].includes(session.status))
     .map((session) => session.day);
   if (activeRunFieldDays.length > 5 || new Set(activeRunFieldDays).size !== activeRunFieldDays.length) return null;
   if (proposal.changes.some((change) => !sessions.some((session) => session.id === change.sessionId))) return null;

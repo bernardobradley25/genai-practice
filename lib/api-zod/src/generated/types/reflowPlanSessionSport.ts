@@ -12,5 +12,6 @@ export type ReflowPlanSessionSport = typeof ReflowPlanSessionSport[keyof typeof 
 export const ReflowPlanSessionSport = {
   Run: 'Run',
   Soccer: 'Soccer',
+  Surf: 'Surf',
   Strength: 'Strength',
 } as const;

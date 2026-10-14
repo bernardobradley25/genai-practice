@@ -46,6 +46,7 @@
 .sport-icon { display: grid; place-items: center; margin-top: 12px; width: 26px; height: 26px; border-radius: 7px; }
 .sport-run { color: #345f4c; background: #e8eee0; }
 .sport-soccer { color: #ba7040; background: #f6e9dc; }
+.sport-surf { color: #347b80; background: #e0f0ed; }
 .sport-strength { color: #637266; background: #e9eae3; }
 .day-card h3 { margin: 8px 0 4px; color: #354c40; font-size: 11px; line-height: 1.28; font-weight: 700; }
 .session-detail { margin: 0; min-height: 24px; color: #858e84; font-size: 9px; line-height: 1.35; }
@@ -63,7 +64,7 @@
 .legend { display: flex; gap: 13px; }
 .legend span { display: inline-flex; align-items: center; gap: 5px; color: #818b81; font-size: 9px; }
 .legend-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; }
-.run-dot { background: #65866d; }.soccer-dot { background: #d18b58; }.strength-dot { background: #9ca89a; }
+.run-dot { background: #65866d; }.soccer-dot { background: #d18b58; }.surf-dot { background: #4f9a9b; }.strength-dot { background: #9ca89a; }
 .plan-note { color: #8a9389; font-size: 9px; }
 .coach-panel { display: flex; flex-direction: column; overflow: hidden; }
 .coach-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 20px 21px 17px; border-bottom: 1px solid #e8e7dd; }
