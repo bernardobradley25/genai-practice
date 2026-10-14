@@ -1,0 +1,218 @@
+## Overview
+
+In this milestone, you will use **Replit and AI-assisted development** to build the smallest working version of the product you described in **Project Problem Framing**.
+
+Your goal is not to build a polished or complete product. Your goal is to create **one basic end-to-end user flow**:
+
+1. The user provides an input or takes an action.
+2. The product does something in response.
+3. The user receives a visible result.
+
+For example, a meal-planning product might let a user enter ingredients, press a button, and receive several meal suggestions. It does not yet need accounts, saved recipes, shopping lists, payments, or professional visual design.
+
+<aside>
+🎭
+
+**This is a prototype, not a finished technical system.** You may use a **Wizard-of-Oz prototype**: the user experiences what the product is intended to do, while some or all of the underlying behavior is simulated, hard-coded, prewritten, or completed manually. The purpose is to test the idea and user experience before investing time in full implementation.
+
+</aside>
+
+A small, believable flow is more valuable at this stage than a large prototype with many incomplete features.
+
+---
+
+## Suggested Time Plan
+
+Use the 2–3 hour limit to keep the project focused:
+
+- **15 minutes:** Choose the single user flow you will build.
+- **90–120 minutes:** Build and debug the flow in Replit.
+- **20 minutes:** Run three tests and record the results.
+- **15 minutes:** Update the README and submit your links.
+
+If you reach the time limit, stop adding features. Record unfinished ideas as limitations or future work.
+
+---
+
+## What You Are Building
+
+Build one simple working slice based on your **Project Problem Framing** submission.
+
+The slice must include:
+
+- A clear starting point
+- One central user input, choice, or action
+- A visible result
+- Enough labels or instructions for another person to understand what to do
+
+The slice may be contained on a single screen. Visual polish is not required.
+
+The underlying technology does **not** need to be fully functional. Acceptable Wizard-of-Oz techniques include:
+
+- Displaying a prewritten or hard-coded result after the user submits an input
+- Using sample data instead of a database
+- Moving through prepared screens that demonstrate the intended interaction
+- Manually creating a response that a future AI system would generate
+- Simulating a login, recommendation, analysis, or other complex service
+- Demonstrating only a few carefully selected inputs
+
+The prototype should make the intended experience understandable. It does not need a functioning backend, database, authentication system, external API, or live AI model.
+
+Do not spend time adding:
+
+- User accounts
+- Payment processing
+- Multiple dashboards
+- Large amounts of content
+- Advanced personalization
+- Every feature from your long-term vision
+- A custom domain or separate paid hosting
+
+---
+
+## AI Expectations
+
+Your final course project must include a meaningful role for AI inside the product. Using Replit to write code does not count as the product’s AI functionality.
+
+For this milestone, the product’s AI behavior **may be entirely simulated**. You are not required to connect an AI model or API.
+
+For example, a user might submit information and receive a prewritten recommendation that represents the kind of result the future AI system would produce. This is acceptable if the prototype helps another person understand and respond to the intended experience.
+
+In the README, clearly identify:
+
+- What the future AI system is intended to do
+- Which behavior currently works
+- Which behavior is simulated or completed manually
+
+Wizard-of-Oz methods are a legitimate prototyping technique, not a shortcut to conceal. Be transparent about them. Never place an API key, password, or access token in a public GitHub repository.
+
+---
+
+## Required Deliverables
+
+## 1. First Working Slice
+
+A user should be able to open the prototype and move through one central task.
+
+For this assignment, “working” means that the **user-facing flow can be experienced from beginning to end**. It does not mean every underlying system is operational.
+
+The prototype should:
+
+- Accept or represent an input or action
+- Show the result the product is intended to provide
+- Avoid a dead end in the main flow
+- Be understandable without a long explanation
+
+The result may be hard-coded, prewritten, selected from sample responses, or produced manually. The prototype does not need a functioning backend, database, external API, or live AI integration.
+
+---
+
+## 2. Three Quick Test Cases
+
+Run the following three tests:
+
+1. **Typical case:** A normal input from the intended user.
+2. **Challenge case:** An unusual, ambiguous, or difficult input.
+3. **Invalid or empty case:** Missing, unsupported, or incorrect input.
+
+Record each test in a short table:
+
+| Test | Input or action | What happened | Pass, partial, or fail |
+| --- | --- | --- | --- |
+| Typical case |  |  |  |
+| Challenge case |  |  |  |
+| Invalid or empty case |  |  |  |
+
+Test the experience that a user sees, including simulated behavior. You are evaluating whether the flow communicates the idea clearly—not whether the underlying technology is production-ready.
+
+A screenshot is optional. You do not need a formal testing report.
+
+---
+
+## 3. Known Limitations
+
+List **two or three current limitations**.
+
+These may include:
+
+- A feature that is still simulated
+- AI output that is inconsistent or sometimes incorrect
+- Missing error handling
+- No saved data
+- Limited mobile support
+- A confusing part of the interface
+- A feature intentionally left outside this first slice
+
+Use one or two sentences per limitation. Briefly state what does not work yet or what you would improve next.
+
+---
+
+## 4. Minimal Repository Documentation
+
+Continue using the public GitHub repository created during **Project Set-Up**.
+
+Update the **README.md** with:
+
+- The product name and a one-sentence description
+- What the first working slice allows a user to do
+- A link or simple instructions for opening the prototype
+- Whether the product’s AI behavior is working or simulated
+- Your three test results
+- Your known limitations
+
+You do not need to submit:
+
+- A revised PRD
+- A separate testing document
+- A complete prompt transcript
+- A detailed technical architecture
+- Screenshots unless they help explain a problem
+
+Make sure the public repository does not contain passwords, API keys, or other secrets.
+
+---
+
+## Submission
+
+Submit the following in Canvas:
+
+1. Your **public GitHub repository link**
+2. Your **working Replit or prototype link**
+3. A note identifying where the tests and limitations appear in the README
+
+Before submitting, confirm that both links open.
+
+Separate paid hosting is not required.
+
+---
+
+## Looking Ahead
+
+This prototype will later be used for **Project Peer Review**. You will have time to improve its design, AI integration, testing, and documentation during later project milestones.
+
+For now, prioritize one flow that another person can try.
+
+---
+
+## Rubric — 100 Points
+
+| Category | Excellent | Proficient | Developing | Needs Improvement |
+| --- | --- | --- | --- | --- |
+| **Prototype Flow — 40 pts** | A user can experience one clear task from input or action through a visible result. Wizard-of-Oz elements are coherent and support the intended experience. | The main flow is understandable with a minor gap, bug, or confusing step. | Parts of the intended experience are visible, but the user encounters a significant gap or cannot understand the result. | The prototype cannot be opened or does not communicate a complete central task. |
+| **AI Role and Transparency — 15 pts** | The intended AI role is clear and relevant, and the student accurately identifies what is functional, simulated, or manual. | The intended AI role and prototype status are generally clear but need more explanation. | The AI role is vague, weakly connected, or unclear about what is simulated. | The intended AI role is absent or the prototype misrepresents simulated behavior as functional. |
+| **Three Test Cases — 20 pts** | Three distinct tests are completed and clearly report what happened. | Three tests are included, but one is repetitive or unclear. | Tests are incomplete or cover only successful inputs. | Fewer than three usable tests are provided. |
+| **Known Limitations — 15 pts** | Two or three specific limitations are identified with realistic next steps. | Relevant limitations are identified but described briefly or generally. | Limitations are vague or focus only on visual polish. | Limitations are missing or inconsistent with the prototype. |
+| **Repository and README — 10 pts** | Repository is accessible, contains the current work, and the README includes all required information. | Repository is usable with a minor documentation omission. | Repository is accessible, but instructions or documentation are incomplete. | Repository is inaccessible, missing major work, or exposes sensitive information. |
+
+---
+
+## What I Am Looking For
+
+I am looking for evidence that you can:
+
+- Turn your idea into one understandable prototype experience
+- Use an AI coding tool without expanding the scope unnecessarily
+- Use simulation deliberately to test an idea before fully building it
+- Check whether another person can follow and respond to the intended experience
+- Recognize what is functional, simulated, or still missing
+- Prepare a simple prototype that can be improved through feedback
