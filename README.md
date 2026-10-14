@@ -2,11 +2,21 @@
 
 Reflow is a prototype coaching experience for adult amateur athletes balancing running, recreational sport, and strength training.
 
-## First working slice
+## MVP: what it does
 
-Open the Reflow Training Coach preview at the project root (`/`). The fictional athlete can talk with Reflow in their own words about a change. When they mention a missed workout and another activity, Reflow proactively compares their likely overall load and sport-specific stimulus, asks for missing activity details when needed, and offers practical options for the current week without waiting to be prompted. After recommending a specific plan, Reflow asks whether the athlete likes it. Saying yes prepares a “Reflow the week” button; the schedule changes only when the athlete clicks it. Brainstorming or hypothetical discussion never changes the week. The API and plan checks preserve the five run/sport-day limit and block conflicting run/sport days.
+The Reflow MVP is a live, conversational training coach for adapting one fictional athlete’s weekly plan when life changes. It helps the athlete talk through missed sessions, unexpected activities, or upcoming travel; asks follow-up questions about effort, schedule, and available activities; and suggests a week-specific adjustment that considers training stimulus and overall impact.
 
-The chat is session-only: reloading or starting a new chat clears the conversation, and the sample week resets when the page reloads. Run the API and web workflows together during development:
+The plan appears as cards in “This week, at a glance.” The coach can prepare a proposed schedule change, but it does not change the week just because the athlete is brainstorming or says they like the idea. The athlete must click **Reflow the week** to apply the reviewed proposal. The plan checks protect completed workouts, prevent conflicting run/sport sessions, and enforce the five run/sport-day limit.
+
+## How to use the MVP
+
+1. Open the Reflow Training Coach preview at the project root (`/`). The screen shows the sample week and the Reflow chat.
+2. Tell Reflow what changed or what you are planning. For example: “I missed Tuesday’s run but played soccer for 90 minutes,” or “I’ll be traveling next week and can surf, swim, and do bodyweight strength.”
+3. Answer Reflow’s follow-up questions about effort, timing, and what activities or equipment are available. You can discuss alternatives and ask how each option may affect the rest of the week.
+4. Review the specific weekly plan Reflow recommends. Exploring a “what if” does not update the schedule.
+5. When you agree with a specific plan, Reflow stages a **Reflow the week** button. Click it to update the week cards; until then, the sample schedule remains unchanged.
+
+The chat is session-only: starting a new chat clears the conversation, and reloading the page resets the sample week. To run the API and web workflows during development:
 
 ```sh
 pnpm --filter @workspace/api-server run dev
