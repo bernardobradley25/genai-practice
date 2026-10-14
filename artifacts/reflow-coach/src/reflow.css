@@ -117,6 +117,12 @@
 .proposal-session small { display: block; margin-top: 2px; color: #90988e; font-size: 8px; font-weight: 400; }
 .proposal-time { color: #9a7557; font: 400 8px var(--app-font-mono); text-align: right; }
 .plan-update-impact { margin: 8px 0 0; color: #69776c; font-size: 9px; line-height: 1.5; }
+.plan-update-applied { border-color: #cbdccc; }
+.plan-update-error { margin: 8px 0 0; color: #a5483f; font-size: 9px; line-height: 1.45; }
+.reflow-week-button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 32px; margin-top: 10px; padding: 0 10px; border: 0; border-radius: 7px; color: #f8f5e9; background: #315b4d; font-size: 9px; font-weight: 600; cursor: pointer; transition: background .16s, transform .16s, opacity .16s; }
+.reflow-week-button:hover:not(:disabled) { background: #244a3e; transform: translateY(-1px); }
+.reflow-week-button:focus-visible { outline: 2px solid #d89568; outline-offset: 2px; }
+.reflow-week-button:disabled { opacity: .5; cursor: not-allowed; }
 .plan-update-result { margin-top: 8px; color: #547157; font-size: 9px; }
 .coach-prompt { margin: 0 0 14px; color: #53675b; font-size: 13px; line-height: 1.5; }
 .example-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }

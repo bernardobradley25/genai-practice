@@ -1,0 +1,1 @@
+- [Reflow commit flow](reflow-commit-flow.md) — agreeing with a recommendation stages a change; only clicking “Reflow the week” applies it.

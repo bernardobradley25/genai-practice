@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
-import { ArrowUp, Check, LoaderCircle, MessageSquare, Plus, Sparkles } from 'lucide-react';
+import { ArrowUp, Check, LoaderCircle, Plus, RefreshCw, Sparkles } from 'lucide-react';
 import {
   applyPlanProposal,
   isPlanProposal,
@@ -15,11 +15,13 @@ type ChatMessage = {
   content: string;
   includeInHistory?: boolean;
   planUpdate?: PlanProposal;
+  planUpdateApplied?: boolean;
+  planUpdateError?: string;
 };
 
 type ChatEvent =
   | { type: 'delta'; content: string }
-  | { type: 'plan_update'; update: unknown }
+  | { type: 'reflow_ready'; update: unknown }
   | { type: 'error'; message: string }
   | { type: 'done' };
 
@@ -51,10 +53,25 @@ function readEvent(block: string): ChatEvent | null {
   }
 }
 
-function PlanUpdateCard({ update }: { update: PlanProposal }) {
+function PlanUpdateCard({
+  update,
+  applied,
+  error,
+  disabled,
+  onReflow,
+}: {
+  update: PlanProposal;
+  applied: boolean;
+  error?: string;
+  disabled: boolean;
+  onReflow: () => void;
+}) {
   return (
-    <div className="plan-update" data-testid="ai-plan-update">
-      <div className="plan-update-heading"><Check size={14} /> WEEK UPDATED</div>
+    <div className={`plan-update${applied ? ' plan-update-applied' : ''}`} data-testid="reflow-plan-card">
+      <div className="plan-update-heading">
+        {applied ? <Check size={14} /> : <RefreshCw size={13} />}
+        {applied ? 'WEEK REFLOWED' : 'READY TO REFLOW'}
+      </div>
       <div className="proposal-changes">
         {update.changes.map((change) => (
           <div className="proposal-change" key={change.sessionId}>
@@ -65,7 +82,20 @@ function PlanUpdateCard({ update }: { update: PlanProposal }) {
         ))}
       </div>
       <p className="plan-update-impact">{update.impact}</p>
-      <div className="plan-update-result" role="status">Applied to Week at a glance after you agreed.</div>
+      {error && <p className="plan-update-error" role="alert">{error}</p>}
+      {applied ? (
+        <div className="plan-update-result" role="status">Week at a glance now reflects these changes.</div>
+      ) : (
+        <button
+          type="button"
+          className="reflow-week-button"
+          onClick={onReflow}
+          disabled={disabled || Boolean(error)}
+          data-testid="button-reflow-week"
+        >
+          <RefreshCw size={13} /> Reflow the week
+        </button>
+      )}
     </div>
   );
 }
@@ -141,7 +171,7 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
           setMessages((current) => current.map((item) =>
             item.id === assistantId ? { ...item, content: item.content + chatEvent.content } : item,
           ));
-        } else if (chatEvent.type === 'plan_update' && isPlanProposal(chatEvent.update)) {
+        } else if (chatEvent.type === 'reflow_ready' && isPlanProposal(chatEvent.update)) {
           pendingPlanUpdate = chatEvent.update;
         } else if (chatEvent.type === 'error') {
           streamError = chatEvent.message;
@@ -164,19 +194,13 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
       if (streamError) throw new Error(streamError);
       if (!finished) throw new Error('The connection ended before the coach replied. Your week has not changed.');
 
-      if (pendingPlanUpdate) {
-        const revisedWeek = applyPlanProposal(week, pendingPlanUpdate);
-        if (!revisedWeek) throw new Error('That agreed change no longer fits the current week. The week has not changed.');
-        setWeek(revisedWeek);
-      }
-
       setDraft('');
       setMessages((current) => current.map((item) =>
         item.id === assistantId
           ? {
               ...item,
               content: item.content || (pendingPlanUpdate
-                ? 'Done—we updated Week at a glance with the change we agreed on.'
+                ? 'This plan is ready when you are. Click “Reflow the week” to make these changes.'
                 : 'I wasn’t able to put together a useful reply just now. Your plan hasn’t changed.'),
               planUpdate: pendingPlanUpdate ?? undefined,
               includeInHistory: true,
@@ -194,6 +218,30 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
       setIsThinking(false);
       textareaRef.current?.focus();
     }
+  };
+
+  const reflowWeek = (messageId: string, update: PlanProposal) => {
+    const revisedWeek = applyPlanProposal(week, update);
+    if (!revisedWeek) {
+      setMessages((current) => current.map((item) =>
+        item.id === messageId
+          ? { ...item, planUpdateError: 'This Reflow no longer fits the current week. Your week is unchanged.' }
+          : item,
+      ));
+      return;
+    }
+
+    setWeek(revisedWeek);
+    setMessages((current) => current.map((item) =>
+      item.id === messageId
+        ? {
+            ...item,
+            content: `${item.content}\n\nReflowed—the updated week is shown in Week at a glance.`,
+            planUpdateApplied: true,
+            planUpdateError: undefined,
+          }
+        : item,
+    ));
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -227,7 +275,15 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
             <div className="message-content">
               <span className="message-sender">{message.role === 'user' ? 'YOU' : 'REFLOW'}</span>
               {message.content ? <p>{message.content}</p> : <span className="thinking-indicator"><LoaderCircle size={16} /> Thinking through your week…</span>}
-              {message.planUpdate && <PlanUpdateCard update={message.planUpdate} />}
+              {message.planUpdate && (
+                <PlanUpdateCard
+                  update={message.planUpdate}
+                  applied={Boolean(message.planUpdateApplied)}
+                  error={message.planUpdateError}
+                  disabled={isThinking}
+                  onReflow={() => reflowWeek(message.id, message.planUpdate!)}
+                />
+              )}
             </div>
           </article>
         ))}

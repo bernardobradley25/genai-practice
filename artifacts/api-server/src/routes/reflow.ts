@@ -14,12 +14,12 @@ const dayNames: Record<string, string> = {
   sun: "Sunday",
 };
 
-const consensusPlanTool = {
+const prepareReflowTool = {
   type: "function" as const,
   function: {
-    name: "apply_consensus_plan_changes",
+    name: "prepare_week_reflow",
     description:
-      "Return the exact schedule changes only after the athlete explicitly confirms a specific option in chat. The client immediately applies this update, so never call while exploring, comparing, or before consent.",
+      "Prepare the exact schedule changes as a pending Reflow card only after the athlete clearly agrees with a specific plan in chat or directly requests a specific edit. The athlete must still click Reflow the week; never treat this tool call as applying the schedule.",
     strict: true,
     parameters: {
       type: "object",
@@ -136,12 +136,12 @@ function validateProposal(
   return { impact: proposal.impact, changes };
 }
 
-function hasExplicitPlanConsent(messages: Array<{ role: string; content: string }>): boolean {
+function hasClearReflowIntent(messages: Array<{ role: string; content: string }>): boolean {
   const latest = messages.at(-1);
   if (!latest || latest.role !== "user") return false;
 
   const text = latest.content.trim().toLowerCase();
-  if (!text || /\b(maybe|perhaps|not sure|what if|i wonder|explore|compare|explain|wait|hold on|not yet|hold off|before i decide)\b/i.test(text)) {
+  if (!text || /\b(maybe|perhaps|not sure|what if|i wonder|explore|compare|explain|wait|hold on|not yet|hold off|before i decide|but|except|although)\b/i.test(text)) {
     return false;
   }
 
@@ -149,21 +149,22 @@ function hasExplicitPlanConsent(messages: Array<{ role: string; content: string 
   const statedEdit = /^(?:i want you to|i want to|i'd like you to|i'd like to)\s+(?:apply|make|update|change|move|replace|switch|add|shorten|extend|skip|mark|set)\b/i;
   if (directEdit.test(text) || (statedEdit.test(text) && /\b(?:that|it|recommended|first|second|third|monday|tuesday|wednesday|thursday|friday|saturday|sunday|easy run|steady run|long run|soccer)\b/i.test(text))) return true;
 
-  const explicitChoice = /^(?:yes|yeah|yep|sure|okay|ok|go ahead|do it|do that|let'?s do it|let'?s do that|that works|sounds good|i agree|i approve|i choose|i'll go with|i will go with|let'?s go with|i'll take|i will take|let'?s take|take the (?:first|second|third) option)\b/i;
-  if (!explicitChoice.test(text)) return false;
-
   const previousAssistant = messages
     .slice(0, -1)
     .reverse()
     .find((message) => message.role === "assistant")?.content ?? "";
-  return /\b(?:should i|shall i|would you like me to|do you want me to|want me to)\b.{0,120}\b(?:update|apply|change|move|replace|shorten|extend|make|set|put)\b/i.test(previousAssistant);
+  const assistantAskedForAgreement =
+    /\b(?:do you like (?:this|the) plan|does (?:this|that|the plan)(?: plan)? work for you|would (?:this|that) work for you|are you (?:happy|good) with (?:this|the) plan|would you like me to (?:prepare|stage|reflow|update|apply|change|move|replace|shorten|extend|make|set|put))\b/i.test(previousAssistant);
+  if (!assistantAskedForAgreement) return false;
+
+  return /^(?:i (?:really )?like (?:the|this|that) plan|i like (?:it|that)|i(?:'m| am) (?:happy with (?:this|the) plan|good with that)|that works(?: for me)?|sounds good|looks good|i agree|i approve|i choose|yes|yeah|yep|sure|okay|ok|go ahead|do it|do that|let'?s do it|let'?s do that|let'?s go with|i'll go with|i will go with|i'll take|i will take|let'?s take|take the (?:first|second|third) option)\b/i.test(text);
 }
 
 const systemPrompt = `You are Reflow, a thoughtful AI training-coach conversation partner for adult amateur athletes balancing endurance sport, recreational sport, strength, and real-life constraints.
 
 This is a collaborative conversation, not a questionnaire or a menu of canned cases. Respond to the athlete's actual words, take initiative in the analysis, and carry useful context forward. Ask the smallest set of nonredundant questions needed to understand an activity; more than one question in a turn is fine when several details matter. Group related questions naturally and explain why the answer changes the estimate. Do not ask the athlete to decide whether an activity "replaced" a workout when they have already described both the missed session and the extra activity; help them evaluate that together.
 
-The current fictional sample athlete is an adult amateur training for a comfortable 10K. The weekly limit is no more than five run/field days. Use the current week sent with the conversation as the plan, but treat the athlete's explicit report that a session was missed, moved, or completed as the factual history for your analysis. A conversational assessment does not update the plan shown in the app; only an in-chat-confirmed update does. Do not assume soccer is equivalent to a run, that a missed workout must be made up, or that more training is automatically better. Account for all sports and recovery in the same week. Before stating a weekly run/field-day count, enumerate the distinct actual and remaining planned activity days; do not count a reported missed workout as completed or omit another planned sport. If you cannot confidently reconcile the days, leave out the count. Be clear about assumptions, trade-offs, and uncertainty. There are no reviewed training references connected, so do not invent research, citations, or precise training-load calculations.
+The current fictional sample athlete is an adult amateur training for a comfortable 10K. The weekly limit is no more than five run/field days. Use the current week sent with the conversation as the plan, but treat the athlete's explicit report that a session was missed, moved, or completed as the factual history for your analysis. A conversational assessment or a prepared Reflow card does not update the plan shown in the app; only clicking the "Reflow the week" button does. Do not assume soccer is equivalent to a run, that a missed workout must be made up, or that more training is automatically better. Account for all sports and recovery in the same week. Before stating a weekly run/field-day count, enumerate the distinct actual and remaining planned activity days; do not count a reported missed workout as completed or omit another planned sport. If you cannot confidently reconcile the days, leave out the count. Be clear about assumptions, trade-offs, and uncertainty. There are no reviewed training references connected, so do not invent research, citations, or precise training-load calculations.
 
 When an athlete mentions a missed planned workout and another activity from the same day or period, use the missed workout as the natural comparison target unless there is genuine ambiguity. Do not ask which session the activity replaced just because they have not decided whether it counts as a replacement. If details that could change the comparison are missing, ask for them before giving a firm lower/similar/higher rating or a best-fit recommendation. Ask about relevant facts such as active time versus total elapsed time, perceived effort, and whether movement was continuous or stop-start; use details already given and group related questions naturally. Until those details are clear, do not assign a categorical impact or recommend a schedule change based on duration alone. Briefly tell the athlete what information is missing and why; avoid giving a full options list before the comparison is ready.
 
@@ -173,7 +174,7 @@ Then offer two or three concrete, week-specific paths and their trade-offs witho
 
 Keep replies concise but allow enough room to explain a comparison and options (usually under 220 words). Use bullets when they make trade-offs easier to compare. Do not keep asking questions once the relevant details are known; move to the estimate and options. Do not certify that a schedule will achieve a goal or that a change is safe, and do not turn incomplete self-reported activity into a confident prescription.
 
-Keep exploratory options in the conversation. Recommend a best-fit option, summarize the exact change, and ask plainly, "Would you like me to update Week at a glance with this change?" Do not call the apply_consensus_plan_changes tool for brainstorming, hypotheticals, or an ambiguous "yes" after several options. Call it only after the athlete clearly confirms the exact option in chat (or directly requests a specific edit); the update is applied immediately, with no second approval button. If the athlete is still weighing options, ask which they choose and leave the week unchanged. After a successful update, state what changed. When moving a run or field session to an occupied day, include an appropriate change to the existing session too. Preserve completed sessions. The app checks the five run/field-day cap and conflicting run/field days before applying an update.
+Keep exploratory options in the conversation. Recommend one best-fit option, summarize the exact schedule changes, and ask plainly, "Do you like this plan?" When the athlete clearly likes or agrees with that specific plan—or directly requests a specific schedule edit—call prepare_week_reflow to stage a validated Reflow card. Tell the athlete the week is not changed yet and invite them to click "Reflow the week" when ready. Never say the schedule is updated until that button is clicked. Do not stage a change while brainstorming, comparing, responding to hypotheticals, or when the athlete is unsure or qualifies agreement with a concern. If the athlete is still weighing options, leave the week unchanged. When moving a run or field session to an occupied day, include an appropriate change to the existing session too. Preserve completed sessions. The app checks the five run/field-day cap and conflicting run/field days before allowing a Reflow.
 
 Stay within general planning support. Do not diagnose or advise on injury, rehabilitation, medication, or medical conditions; for those, say this prototype cannot guide the decision and suggest a qualified professional. Keep replies clear, conversational, and concise without sounding like a form or checklist.`;
 
@@ -189,7 +190,7 @@ router.post("/reflow/chat", async (req, res): Promise<void> => {
     res.status(400).json({ error: "The latest message must be from you." });
     return;
   }
-  const hasPlanConsent = hasExplicitPlanConsent(messages);
+  const hasReflowIntent = hasClearReflowIntent(messages);
 
   const planContext = week.map((session) =>
     `${session.day}: ${session.sport} — ${session.title}; ${session.detail}; ${session.time}; status: ${session.status}`,
@@ -208,9 +209,9 @@ router.post("/reflow/chat", async (req, res): Promise<void> => {
       max_completion_tokens: 8192,
       reasoning_effort: "none",
       messages: chatMessages,
-      ...(hasPlanConsent
+      ...(hasReflowIntent
         ? {
-            tools: [consensusPlanTool],
+            tools: [prepareReflowTool],
             tool_choice: "auto" as const,
             parallel_tool_calls: false,
           }
@@ -226,8 +227,8 @@ router.post("/reflow/chat", async (req, res): Promise<void> => {
     let assistantText = "";
     let functionName = "";
     let functionArguments = "";
-    let planUpdateSent = false;
-    let planUpdateFailed = false;
+    let reflowReadySent = false;
+    let reflowPreparationFailed = false;
     for await (const chunk of stream) {
       const delta = chunk.choices[0]?.delta;
       if (typeof delta?.content === "string") {
@@ -240,33 +241,33 @@ router.post("/reflow/chat", async (req, res): Promise<void> => {
       }
     }
 
-    if (functionName === "apply_consensus_plan_changes" && hasPlanConsent) {
+    if (functionName === "prepare_week_reflow" && hasReflowIntent) {
       try {
         const update = validateProposal(JSON.parse(functionArguments), week);
         if (update) {
-          res.write(`data: ${JSON.stringify({ type: "plan_update", update })}\n\n`);
-          planUpdateSent = true;
+          res.write(`data: ${JSON.stringify({ type: "reflow_ready", update })}\n\n`);
+          reflowReadySent = true;
         } else {
-          planUpdateFailed = true;
-          req.log.warn("AI consensus plan update failed schedule validation");
+          reflowPreparationFailed = true;
+          req.log.warn("AI Reflow preparation failed schedule validation");
         }
       } catch {
-        planUpdateFailed = true;
-        req.log.warn("AI consensus plan update could not be parsed");
+        reflowPreparationFailed = true;
+        req.log.warn("AI Reflow preparation could not be parsed");
       }
-    } else if (functionName === "apply_consensus_plan_changes") {
-      req.log.warn("Blocked AI plan update without explicit athlete confirmation");
+    } else if (functionName === "prepare_week_reflow") {
+      req.log.warn("Blocked Reflow preparation without clear athlete agreement");
     }
 
-    if (planUpdateFailed) {
-      res.write(`data: ${JSON.stringify({ type: "error", message: "I couldn’t safely apply that change. Your week is unchanged; tell me which specific option you want to use." })}\n\n`);
+    if (reflowPreparationFailed) {
+      res.write(`data: ${JSON.stringify({ type: "error", message: "I couldn’t safely prepare that Reflow. Your week is unchanged; tell me which specific option you want to use." })}\n\n`);
       res.end();
       return;
     }
 
-    if (!assistantText.trim() && !planUpdateSent) {
-      const content = functionName === "apply_consensus_plan_changes"
-        ? "I’ll leave Week at a glance unchanged until you confirm which specific option you want."
+    if (!assistantText.trim() && !reflowReadySent) {
+      const content = functionName === "prepare_week_reflow"
+        ? "I’ll leave Week at a glance unchanged until you clearly choose a specific plan."
         : "I couldn’t form a useful reply just now. Your plan hasn’t changed—could you try that again?";
       res.write(`data: ${JSON.stringify({ type: "delta", content })}\n\n`);
     }

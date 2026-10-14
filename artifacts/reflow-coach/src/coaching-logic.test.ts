@@ -10,7 +10,7 @@ const discussedMove = {
   ],
 };
 
-test('applies a reviewed proposal while preserving the original plan object', () => {
+test('commits a staged Reflow while preserving the original plan object', () => {
   const updatedWeek = applyPlanProposal(initialWeek, discussedMove);
 
   assert.ok(updatedWeek);
