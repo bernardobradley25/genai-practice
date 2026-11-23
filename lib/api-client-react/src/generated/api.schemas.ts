@@ -50,6 +50,7 @@ export const ReflowPlanSessionSport = {
   Run: 'Run',
   Soccer: 'Soccer',
   Surf: 'Surf',
+  Swim: 'Swim',
   Strength: 'Strength',
 } as const;
 

@@ -1,0 +1,123 @@
+{
+  "case": "soccer-substitution",
+  "runAt": "2026-11-23T23:30:25.962Z",
+  "initialWeek": [
+    {
+      "id": "mon",
+      "day": "Monday",
+      "shortDay": "MON",
+      "sport": "Strength",
+      "title": "Full-body strength",
+      "detail": "45 min · moderate",
+      "time": "6:30 PM",
+      "status": "done"
+    },
+    {
+      "id": "tue",
+      "day": "Tuesday",
+      "shortDay": "TUE",
+      "sport": "Run",
+      "title": "Easy run",
+      "detail": "35 min · conversational",
+      "time": "7:00 AM",
+      "status": "planned"
+    },
+    {
+      "id": "wed",
+      "day": "Wednesday",
+      "shortDay": "WED",
+      "sport": "Soccer",
+      "title": "Club training",
+      "detail": "75 min · variable",
+      "time": "7:15 PM",
+      "status": "planned"
+    },
+    {
+      "id": "thu",
+      "day": "Thursday",
+      "shortDay": "THU",
+      "sport": "Run",
+      "title": "Steady run",
+      "detail": "40 min · controlled",
+      "time": "6:45 AM",
+      "status": "planned"
+    },
+    {
+      "id": "fri",
+      "day": "Friday",
+      "shortDay": "FRI",
+      "sport": "Strength",
+      "title": "Strength + mobility",
+      "detail": "40 min · moderate",
+      "time": "5:30 PM",
+      "status": "planned"
+    },
+    {
+      "id": "sat",
+      "day": "Saturday",
+      "shortDay": "SAT",
+      "sport": "Run",
+      "title": "Long easy run",
+      "detail": "60 min · relaxed",
+      "time": "9:00 AM",
+      "status": "planned"
+    },
+    {
+      "id": "sun",
+      "day": "Sunday",
+      "shortDay": "SUN",
+      "sport": "Run",
+      "title": "Recovery buffer",
+      "detail": "Unplanned space",
+      "time": "Open",
+      "status": "rest"
+    }
+  ],
+  "results": [
+    {
+      "prompt": "I skipped Tuesday’s easy run and played soccer instead. Does that count as the run?",
+      "status": 200,
+      "elapsedMs": 1919,
+      "text": "How long were you actively playing, and how hard did it feel overall (easy, moderate, hard)? Also, was it fairly continuous or lots of short bursts/rests?\n\nThat changes the comparison: soccer can create substantial stop-start and leg-load fatigue, but it usually doesn’t give the same continuous easy aerobic stimulus as Tuesday’s 35-minute conversational run.",
+      "errors": []
+    },
+    {
+      "prompt": "The soccer was Tuesday at 7 PM: 60 active minutes in a 90-minute game, effort 8 out of 10, lots of sprints and stops. I am not sore. Wednesday club training is still planned.",
+      "status": 200,
+      "elapsedMs": 5268,
+      "text": "Yes—count Tuesday as a real training day, but not as an equivalent easy run.\n\nCompared with the missed 35-minute conversational run, the soccer was likely **higher overall stress**: 60 active minutes at 8/10 with repeated sprints and stops. The stimulus is different, though: soccer is intermittent and high-intensity rather than steady easy aerobic running. With club training still Wednesday, the main issue is back-to-back field load, even if you aren’t sore today.\n\nActual/remaining run-sport days:\n- Tuesday: soccer completed\n- Wednesday: club soccer planned\n- Thursday: 40-minute steady run planned\n- Saturday: 60-minute long easy run planned\n\nBest fit: **do not make up Tuesday’s easy run.** Keep Wednesday soccer, then reassess Thursday based on how your legs feel after it:\n- **Preferred:** keep Thursday’s steady run only if you feel normal; otherwise shorten it to an easy 20–30 minutes rather than forcing steady work.\n- **Partial make-up:** not recommended this week—an extra ~17–18 minutes would add load after two soccer days.\n- **Add-on to an existing easy run:** if you strongly want some extra easy volume, add no more than 10–15 relaxed minutes to Saturday’s long run *only if* Thursday and Saturday both feel good. Don’t create a new Sunday session.\n\nThis preserves recovery and avoids piling a missed easy run onto an already sport-heavy stretch. Do you like this plan?",
+      "errors": []
+    },
+    {
+      "prompt": "Yes, prepare your recommended plan for review.",
+      "status": 200,
+      "elapsedMs": 2794,
+      "text": "",
+      "proposal": {
+        "impact": "Tuesday’s missed easy run stays missed because the 60-minute hard, stop-start soccer game already created higher overall stress. Keep Wednesday club soccer, and make Thursday a flexible 20–30 minute easy run instead of the planned steady run to protect recovery after consecutive soccer days. Saturday’s long easy run remains unchanged; do not add a separate make-up session.",
+        "changes": [
+          {
+            "sessionId": "tue",
+            "sport": "Run",
+            "day": "Tuesday",
+            "time": "7:00 AM",
+            "title": "Easy run — missed",
+            "detail": "35 min · conversational",
+            "status": "missed"
+          },
+          {
+            "sessionId": "thu",
+            "sport": "Run",
+            "day": "Thursday",
+            "time": "6:45 AM",
+            "title": "Easy recovery run",
+            "detail": "30 min · easy; shorten to 20 min if legs feel heavy after Wednesday soccer",
+            "status": "moved"
+          }
+        ]
+      },
+      "valid": true,
+      "errors": []
+    }
+  ]
+}

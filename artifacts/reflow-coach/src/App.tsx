@@ -13,7 +13,7 @@ import { Activity, CalendarDays, Check, Clock3, Dumbbell, Footprints, Info, Rota
 function sportIcon(sport: Session['sport']) {
   if (sport === 'Run') return <Footprints size={16} strokeWidth={1.8} />;
   if (sport === 'Soccer') return <Activity size={16} strokeWidth={1.8} />;
-  if (sport === 'Surf') return <Waves size={16} strokeWidth={1.8} />;
+  if (sport === 'Surf' || sport === 'Swim') return <Waves size={16} strokeWidth={1.8} />;
   return <Dumbbell size={16} strokeWidth={1.8} />;
 }
 
@@ -28,7 +28,7 @@ function App() {
     setConversationVersion((version) => version + 1);
   };
 
-  const { dayCount, runCount, soccerCount, surfCount, strengthCount } = summarizeWeek(week);
+  const { dayCount, runCount, soccerCount, surfCount, swimCount, strengthCount } = summarizeWeek(week);
 
   return (
     <div className="app-shell">
@@ -111,9 +111,10 @@ function App() {
                 <span><i className="legend-dot run-dot" /> Run</span>
                 <span><i className="legend-dot soccer-dot" /> Soccer</span>
                 <span><i className="legend-dot surf-dot" /> Surf</span>
+                <span><i className="legend-dot swim-dot" /> Swim</span>
                 <span><i className="legend-dot strength-dot" /> Strength</span>
               </div>
-              <span className="plan-note">{runCount} runs · {soccerCount} soccer · {surfCount} surf · {strengthCount} strength</span>
+              <span className="plan-note">{runCount} runs · {soccerCount} soccer · {surfCount} surf · {swimCount} swim · {strengthCount} strength</span>
             </div>
           </section>
 

@@ -48,7 +48,7 @@ export const ReflowChatBody = zod.object({
   "id": zod.enum(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']),
   "day": zod.string().max(reflowChatBodyWeekItemDayMax),
   "shortDay": zod.string().max(reflowChatBodyWeekItemShortDayMax),
-  "sport": zod.enum(['Run', 'Soccer', 'Surf', 'Strength']),
+  "sport": zod.enum(['Run', 'Soccer', 'Surf', 'Swim', 'Strength']),
   "title": zod.string().max(reflowChatBodyWeekItemTitleMax),
   "detail": zod.string().max(reflowChatBodyWeekItemDetailMax),
   "time": zod.string().max(reflowChatBodyWeekItemTimeMax),

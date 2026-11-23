@@ -23,10 +23,12 @@ const fixture = http.createServer(async (req, res) => {
   if (text.includes('invalid')) { changes[0].day='Friday'; changes[0].time='25:99 PM'; }
   if (text.includes('zero')) { changes[0].day='Friday'; changes[0].detail='0 min'; }
   if (text.includes('after soccer')) { changes[0].time='8:30 PM'; }
+  if (text.includes('swim')) changes=[{sessionId:'thu',sport:'Swim',day:'Thursday',time:'6:30 PM',title:'Easy swim',detail:'30 min · easy',status:'moved'}];
+  if (text.includes('completed soccer')) changes=[{sessionId:'tue',sport:'Soccer',day:'Tuesday',time:'7:00 PM',title:'Soccer instead of run',detail:'90 min elapsed · 60 active · hard',status:'done'}];
   res.writeHead(200, {'Content-Type':'text/event-stream'});
   const send = (delta) => res.write(`data: ${JSON.stringify({choices:[{index:0,delta}]})}\n\n`);
   send({content:'LOCAL TEST FIXTURE — this response is scripted to verify the interface and validator. '});
-  if (input.tools) send({tool_calls:[{index:0,id:'fixture-call',type:'function',function:{name:'prepare_week_reflow',arguments:JSON.stringify({impact:'LOCAL TEST FIXTURE — review these changes. No live AI recommendation was generated.',changes})}}]});
+  if (input.tools) send({tool_calls:[{index:0,id:'fixture-call',type:'function',function:{name:'prepare_week_reflow',arguments:JSON.stringify({impact:'LOCAL TEST FIXTURE — review these changes. No live AI recommendation was generated.',changes:Object.fromEntries(['mon','tue','wed','thu','fri','sat','sun'].map(id=>{const change=changes.find(item=>item.sessionId===id);if(!change)return [id,null];const {sessionId,...fields}=change;return [id,fields];}))})}}]});
   else if (text.includes('proposal status')) send({content: input.messages.slice(0, -1).filter(message => message.content.includes('Proposal status:')).map(message => message.content).join('\n') || 'No proposal context received.'});
   else send({content:'For a missed run, mark Tuesday missed and replace Thursday’s steady run with a 35-minute easy run at 6:30 PM. Do you like this plan?'});
   res.end('data: [DONE]\n\n');

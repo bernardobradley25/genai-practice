@@ -1,0 +1,92 @@
+{
+  "case": "missed-run-agreement",
+  "runAt": "2026-11-23T23:30:15.969Z",
+  "initialWeek": [
+    {
+      "id": "mon",
+      "day": "Monday",
+      "shortDay": "MON",
+      "sport": "Strength",
+      "title": "Full-body strength",
+      "detail": "45 min · moderate",
+      "time": "6:30 PM",
+      "status": "done"
+    },
+    {
+      "id": "tue",
+      "day": "Tuesday",
+      "shortDay": "TUE",
+      "sport": "Run",
+      "title": "Easy run",
+      "detail": "35 min · conversational",
+      "time": "7:00 AM",
+      "status": "planned"
+    },
+    {
+      "id": "wed",
+      "day": "Wednesday",
+      "shortDay": "WED",
+      "sport": "Soccer",
+      "title": "Club training",
+      "detail": "75 min · variable",
+      "time": "7:15 PM",
+      "status": "planned"
+    },
+    {
+      "id": "thu",
+      "day": "Thursday",
+      "shortDay": "THU",
+      "sport": "Run",
+      "title": "Steady run",
+      "detail": "40 min · controlled",
+      "time": "6:45 AM",
+      "status": "planned"
+    },
+    {
+      "id": "fri",
+      "day": "Friday",
+      "shortDay": "FRI",
+      "sport": "Strength",
+      "title": "Strength + mobility",
+      "detail": "40 min · moderate",
+      "time": "5:30 PM",
+      "status": "planned"
+    },
+    {
+      "id": "sat",
+      "day": "Saturday",
+      "shortDay": "SAT",
+      "sport": "Run",
+      "title": "Long easy run",
+      "detail": "60 min · relaxed",
+      "time": "9:00 AM",
+      "status": "planned"
+    },
+    {
+      "id": "sun",
+      "day": "Sunday",
+      "shortDay": "SUN",
+      "sport": "Run",
+      "title": "Recovery buffer",
+      "detail": "Unplanned space",
+      "time": "Open",
+      "status": "rest"
+    }
+  ],
+  "results": [
+    {
+      "prompt": "I missed Tuesday’s 35-minute easy run. I have 35 minutes free Thursday at 6:30 PM. I want to keep Saturday’s long run. What do you recommend?",
+      "status": 200,
+      "elapsedMs": 4113,
+      "text": "Thursday already has the 40-minute steady run at 6:45 AM, so adding a second run at 6:30 PM would make it a double-run day and add fatigue close to Saturday’s long run.\n\nBest fit: **don’t make up Tuesday’s full 35 minutes.** Keep Thursday’s steady run as planned, Friday strength/mobility, and Saturday’s 60-minute long easy run. One missed easy run is usually the lower-cost choice versus stacking extra running into an already busy stretch.\n\nIf you strongly want some of the missed volume, a lower-risk compromise is:\n- **Thursday evening:** 15–20 minutes *very easy* only if Thursday morning’s steady run feels controlled and your legs are fresh.\n- Keep it genuinely easy—this is extra aerobic movement, not another quality session.\n- If you do that, be willing to shorten Saturday’s long run slightly if you feel unusually heavy or sore.\n\nI’d choose **no make-up** this week: preserve the steady-run/long-run spacing and arrive at Saturday fresher.",
+      "errors": []
+    },
+    {
+      "prompt": "That sounds good. Please prepare the plan you recommended.",
+      "status": 200,
+      "elapsedMs": 2274,
+      "text": "I’ll keep the week as currently scheduled: Tuesday’s missed easy run stays missed; Thursday remains the 40-minute steady run at 6:45 AM; Friday strength/mobility and Saturday’s 60-minute long easy run stay in place.\n\nI’ve prepared that as a Reflow card. The calendar is **not changed yet**—click **“Reflow the week”** when you’re ready to apply it.",
+      "errors": []
+    }
+  ]
+}

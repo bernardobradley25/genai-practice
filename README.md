@@ -14,6 +14,12 @@ Three anonymous Canvas reviewers reported that they could not access the README,
 
 The revision puts instructions and repository links inside the app, adds sample prompts, and prepares a single submission containing both links, the evaluation, and AI disclosure.
 
+### Live AI scenario regression fixes
+
+A subsequent live evaluation ran 10 fictional scenarios (15 model turns): missed-run approval, soccer substitution, travel/surf, natural rescheduling, hypothetical discussion, swimming, completed-work protection, injury refusal, qualified agreement, and an impossible overlap. The raw before-fix transcripts are in [ai-scenarios](revision-evidence/ai-scenarios).
+
+The evaluation found five defects: approval/reschedule wording failed to enable the review tool; a travel proposal duplicated session edits; a swim was classified as Run; completed replacement soccer was omitted from the calendar; and discussion suggested a second run that the app cannot represent. Fixes broaden clear-intent recognition while retaining refusal/uncertainty checks, use one keyed final edit per session, add Swim throughout the API/calendar, support explicitly reported completed replacements, and align coaching options with calendar constraints. These fixes passed **46 logic tests and 15 API tests (61 total)**, full typechecking, builds, and local browser verification. Live post-publication results are recorded separately after deployment.
+
 ### Public demo polish
 
 The release scope is a polished public demonstration using Jordan’s fictional sample week. It does not collect accounts or save personal training plans.

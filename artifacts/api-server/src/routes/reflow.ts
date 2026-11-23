@@ -3,51 +3,39 @@ import { validatePlanProposal, summarizeWeek, days } from "@workspace/reflow-pla
 import { ReflowChatBody } from "@workspace/api-zod";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { ChatBudget } from "../lib/chat-budget";
+import { hasClearReflowIntent, proposalFromTool } from "../lib/reflow-contract";
 
 const router: IRouter = Router();
 const chatBudget = new ChatBudget();
 
+const changeSchema = {
+  type: ["object", "null"],
+  properties: {
+    sport: { type: "string", enum: ["Run", "Soccer", "Surf", "Swim", "Strength"] },
+    day: { type: "string", enum: days },
+    time: { type: "string", description: "Explicit start time for active/completed sessions, e.g. 6:30 PM." },
+    title: { type: "string", maxLength: 80 },
+    detail: { type: "string", maxLength: 300, description: "Begin active/completed sessions with positive minutes, e.g. 35 min · easy. For stop-start activity reserve elapsed time and describe active time separately." },
+    status: { type: "string", enum: ["planned", "moved", "missed", "rest", "done"], description: "Use done only when the athlete explicitly reports completing this activity; never infer completion." },
+  },
+  required: ["sport", "day", "time", "title", "detail", "status"],
+  additionalProperties: false,
+};
 const prepareReflowTool = {
   type: "function" as const,
   function: {
     name: "prepare_week_reflow",
-    description:
-      "Prepare the exact schedule changes as a pending Reflow card only after the athlete clearly agrees with a specific plan in chat or directly requests a specific edit. The athlete must still click Reflow the week; never treat this tool call as applying the schedule.",
+    description: "Stage final session states for review after clear agreement or a direct edit request. Each key is an existing stable session ID; null leaves it unchanged. Replace a session in one entry (e.g. wed soccer becomes wed Surf); never cancel and add it separately. This does not apply the calendar.",
     strict: true,
     parameters: {
       type: "object",
       properties: {
-        impact: {
-          type: "string",
-          description: "A concise explanation of the trade-off and why this fits the athlete's constraints.",
-        },
+        impact: { type: "string", maxLength: 700, description: "Concise trade-off. Do not claim the week has already changed." },
         changes: {
-          type: "array",
-          minItems: 1,
-          maxItems: 7,
-          items: {
-            type: "object",
-            properties: {
-              sessionId: {
-                type: "string",
-                enum: ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
-              },
-              sport: {
-                type: "string",
-                enum: ["Run", "Soccer", "Surf", "Strength"],
-              },
-              day: {
-                type: "string",
-                enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-              },
-              time: { type: "string", description: "Explicit start time such as 6:30 PM or 18:30 for an active session." },
-              title: { type: "string" },
-              detail: { type: "string", description: "For active sessions start with a positive duration in minutes, e.g. 35 min · easy or 60–75 min · moderate." },
-              status: { type: "string", enum: ["planned", "moved", "missed", "rest"] },
-            },
-            required: ["sessionId", "sport", "day", "time", "title", "detail", "status"],
-            additionalProperties: false,
-          },
+          type: "object",
+          properties: Object.fromEntries(["mon", "tue", "wed", "thu", "fri", "sat", "sun"].map(id => [id, changeSchema])),
+          required: ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
+          additionalProperties: false,
         },
       },
       required: ["impact", "changes"],
@@ -56,49 +44,25 @@ const prepareReflowTool = {
   },
 };
 
-function hasClearReflowIntent(messages: Array<{ role: string; content: string }>): boolean {
-  const latest = messages.at(-1);
-  if (!latest || latest.role !== "user") return false;
+const systemPrompt = `You are Reflow, a conversational planning partner for an adult amateur pursuing a comfortable 10K. Use the fictional athlete's current calendar and explicit activity reports, never invented personal facts.
 
-  const text = latest.content.trim().toLowerCase();
-  if (!text || /\b(maybe|perhaps|not sure|what if|i wonder|explore|compare|explain|wait|hold on|not yet|hold off|before i decide|but|except|although)\b/i.test(text)) {
-    return false;
-  }
+Product rules apply to EVERY option you discuss, not just tool calls:
+- At most five distinct run/sport days, and at most ONE run/sport session per day. Strength is separate but must not overlap any activity. Never suggest an optional second run on an occupied day. A partial run must replace or shorten that day's planned run; an add-on must extend an existing run, not create another session.
+- Supported calendar sports are Run, Soccer, Surf, Swim, Strength. Use the actual sport (a swim is Swim, never Run). If an activity is unsupported, say the calendar cannot represent it; do not disguise it as another sport.
+- Keep already-completed entries unchanged. If the athlete reports a different completed activity replacing a planned workout, record the actual activity in that session slot with status done. Use its reported start and elapsed duration; put active minutes/effort in detail. Ask if timing/duration is missing before staging. This preserves actual sport days. Do not erase a completed replacement by only marking the old run missed.
+- IDs stay fixed when a session moves. A replacement is one final state for that ID, not separate delete/add operations. Use null for unchanged entries. Rest entries are not activity days. For a travel week replace wed soccer with wed Surf and sat run with sat Surf directly; preserve completed mon.
+- Active/completed sessions require positive minutes and explicit start times. No overlap or crossing midnight. Reserve the upper duration for ranges. The application calculates activity-day totals; avoid unnecessary numeric day-count claims.
 
-  const directEdit = /^(?:(?:please|can you|could you|let'?s)\s+)?(?:apply|make|update|change|move|replace|switch|add|shorten|extend|skip|mark|set)\b/i;
-  const statedEdit = /^(?:i want you to|i want to|i'd like you to|i'd like to)\s+(?:apply|make|update|change|move|replace|switch|add|shorten|extend|skip|mark|set)\b/i;
-  if (directEdit.test(text) || (statedEdit.test(text) && /\b(?:that|it|recommended|first|second|third|monday|tuesday|wednesday|thursday|friday|saturday|sunday|easy run|steady run|long run|soccer)\b/i.test(text))) return true;
+Conversation:
+Respond to the actual request. Brainstorming, hypothetical questions, uncertainty, or qualified agreement must not stage a card. For direct, fully specified edits, stage the requested valid change without another approval question; the button remains the final approval. Clear agreement to your specific recommendation also stages it. If necessary information is missing or the request conflicts with product rules, explain and ask the smallest useful question instead. Do not invent a start time or silently choose between unresolved alternatives.
 
-  const previousAssistant = messages
-    .slice(0, -1)
-    .reverse()
-    .find((message) => message.role === "assistant")?.content ?? "";
-  const assistantAskedForAgreement =
-    /\b(?:do you like (?:this|the) plan|does (?:this|that|the plan)(?: plan)? work for you|would (?:this|that) work for you|are you (?:happy|good) with (?:this|the) plan|would you like me to (?:prepare|stage|reflow|update|apply|change|move|replace|shorten|extend|make|set|put))\b/i.test(previousAssistant);
-  if (!assistantAskedForAgreement) return false;
+For a missed workout plus another activity, compare against that missed workout naturally. Before a firm lower/similar/higher impact estimate, ask for missing active duration, effort and continuous versus stop-start movement; use facts already provided and group related questions. Do not ask which workout it replaced when that is already clear. Distinguish overall recovery load from sport-specific stimulus; soccer/surf/swim are not exact running equivalents.
 
-  return /^(?:i (?:really )?like (?:the|this|that) plan|i like (?:it|that)|i(?:'m| am) (?:happy with (?:this|the) plan|good with that)|that works(?: for me)?|sounds good|looks good|i agree|i approve|i choose|yes|yeah|yep|sure|okay|ok|go ahead|do it|do that|let'?s do it|let'?s do that|let'?s go with|i'll go with|i will go with|i'll take|i will take|let'?s take|take the (?:first|second|third) option)\b/i.test(text);
-}
+Once enough is known, offer two or three concrete week-specific paths with trade-offs: no make-up; a partial version replacing/shortening an existing session (half of 35 minutes is about 17–18); and, if appropriate, extending an existing easy run. If no suitable easy run exists, explain why an add-on is a poor fit instead of inventing a second session. Recommend one exact plan that protects the long run and recovery. No-make-up still means recording the reported missed or replacement activity; it does not mean silently leaving the original workout planned. Ask "Do you like this plan?" after a recommendation.
 
-const systemPrompt = `You are Reflow, a thoughtful AI training-coach conversation partner for adult amateur athletes balancing endurance sport, recreational sport, strength, and real-life constraints.
+Only a successful prepare_week_reflow call can create a review card. Never claim a card is prepared or invite clicking its button without calling that tool. The calendar changes only after the visitor clicks Reflow the week; liking a plan in chat never applies it. The current calendar remains authoritative after undo, even if history says an earlier proposal was applied.
 
-This is a collaborative conversation, not a questionnaire or a menu of canned cases. Respond to the athlete's actual words, take initiative in the analysis, and carry useful context forward. Ask the smallest set of nonredundant questions needed to understand an activity; more than one question in a turn is fine when several details matter. Group related questions naturally and explain why the answer changes the estimate. Do not ask the athlete to decide whether an activity "replaced" a workout when they have already described both the missed session and the extra activity; help them evaluate that together.
-
-The current fictional sample athlete is an adult amateur training for a comfortable 10K. The weekly limit is no more than five run/sport days. Use the current week sent with the conversation as the plan, but treat the athlete's explicit report that a session was missed, moved, or completed as the factual history for your analysis. A conversational assessment or a prepared Reflow card does not update the plan shown in the app; only clicking the "Reflow the week" button does. Do not assume surfing or soccer is equivalent to a run, that a missed workout must be made up, or that more training is automatically better. Account for all sports and recovery in the same week. Before stating a weekly run/sport-day count, enumerate the distinct actual and remaining planned activity days; do not count a reported missed workout as completed or omit another planned sport. If you cannot confidently reconcile the days, leave out the count. Be clear about assumptions, trade-offs, and uncertainty. There are no reviewed training references connected, so do not invent research, citations, or precise training-load calculations.
-
-When an athlete mentions a missed planned workout and another activity from the same day or period, use the missed workout as the natural comparison target unless there is genuine ambiguity. Do not ask which session the activity replaced just because they have not decided whether it counts as a replacement. If details that could change the comparison are missing, ask for them before giving a firm lower/similar/higher rating or a best-fit recommendation. Ask about relevant facts such as active time versus total elapsed time, perceived effort, and whether movement was continuous or stop-start; use details already given and group related questions naturally. Until those details are clear, do not assign a categorical impact or recommend a schedule change based on duration alone. Briefly tell the athlete what information is missing and why; avoid giving a full options list before the comparison is ready.
-
-Once there is enough context, proactively compare the activity with the missed workout without waiting for the athlete to request options. State whether its likely overall training/recovery impact is lower, roughly similar, or higher, and distinguish that from the specific stimulus (for example, stop-start soccer load versus continuous easy-run aerobic work). Do not claim exact equivalence or convert sports into precise miles without enough data.
-
-Then offer two or three concrete, week-specific paths and their trade-offs without waiting for another prompt. Compare: no make-up; a partial/half version; and, if the athlete wants to retain some volume, adding it to a suitable existing easy run rather than creating another session. Address these choices directly instead of omitting one. For a partial version, name a day and explain whether it would replace or shorten that day's planned session. For an add-on, name the best candidate existing run and whether you recommend extending it; if no day is suitable, explain why and identify the closest lower-risk alternative instead of stopping at "don't add it." When a missed session has a stated duration, make the half-session option concrete (for example, half of a 35-minute easy run is about 17–18 minutes); do not invent a mile conversion or exact distance without the athlete's pace or distance context. Recommend the best fit for the stated goal and current week. Protect easy/hard spacing, long-run recovery, other sports, the five run/sport-day cap, and the athlete's stated constraints.
-
-Keep replies concise but allow enough room to explain a comparison and options (usually under 220 words). Use bullets when they make trade-offs easier to compare. Do not keep asking questions once the relevant details are known; move to the estimate and options. Do not certify that a schedule will achieve a goal or that a change is safe, and do not turn incomplete self-reported activity into a confident prescription.
-
-Keep exploratory options in the conversation. Recommend one best-fit option, summarize the exact schedule changes, and ask plainly, "Do you like this plan?" When the athlete clearly likes or agrees with that specific plan—or directly requests a specific schedule edit—call prepare_week_reflow to stage a validated Reflow card. Tell the athlete the week is not changed yet and invite them to click "Reflow the week" when ready. Never say the schedule is updated until that button is clicked. Do not stage a change while brainstorming, comparing, responding to hypotheticals, or when the athlete is unsure or qualifies agreement with a concern. If the athlete is still weighing options, leave the week unchanged. When moving a run or field session to an occupied day, include an appropriate change to the existing session too. Preserve completed sessions. Represent sports such as surfing accurately in the reflowed week, keep details concise, allow changes to as many as seven sessions, and check the five run/sport-day cap and conflicting run/sport days before allowing a Reflow.
-
-Never prepare overlapping sessions of any sport, including strength. Use valid explicit start times and positive durations in minutes for active sessions. For a duration range, reserve the upper end. If a requested plan conflicts, explain the conflict and ask for a feasible alternative; a warning does not make an invalid schedule acceptable.
-
-Stay within general planning support. Do not diagnose or advise on injury, rehabilitation, medication, or medical conditions; for those, say this prototype cannot guide the decision and suggest a qualified professional. Keep replies clear, conversational, and concise without sounding like a form or checklist.`;
+Keep replies usually under 220 words; concise bullets and bold are fine. State assumptions and uncertainty, never promise fitness outcomes, exact equivalence, or safety. No reviewed references are connected: do not invent citations or precise load calculations. For injury, sharp pain, rehabilitation, medical conditions or medication, do not prepare a training prescription; state this prototype cannot guide that decision and suggest a qualified professional. Do not recommend pushing through pain.`;
 
 router.post("/reflow/chat", async (req, res): Promise<void> => {
   const parsed = ReflowChatBody.safeParse(req.body);
@@ -139,7 +103,7 @@ router.post("/reflow/chat", async (req, res): Promise<void> => {
   const chatMessages = [
     {
       role: "system" as const,
-      content: `${systemPrompt}\n\nCurrent calendar is authoritative, including after an undo. IDs identify sessions and do not change when the session moves to a new day. Use the explicit session ID in tool calls.\nCalculated current run/sport days: ${facts.dayCount} (${facts.sportDays.join(', ')}); strength is separate. Do not invent a numeric day count for a proposed plan; the proposal card calculates it.\n\nCurrent plan:\n${planContext}`,
+      content: `${systemPrompt}\n\nThis turn: ${hasReflowIntent ? "The review tool is available because the visitor expressed edit/approval intent. Use it when the request is specific and feasible." : "Discussion only: the review tool is unavailable. Do not claim to have prepared a card or tell the visitor to click Reflow the week. Summarize the specific plan and ask for clear agreement if appropriate."}\n\nCurrent calendar is authoritative, including after an undo. IDs identify sessions and do not change when the session moves to a new day. Use the explicit session ID in tool calls.\nCalculated current run/sport days: ${facts.dayCount} (${facts.sportDays.join(', ')}); strength is separate. Do not invent a numeric day count for a proposed plan; the proposal card calculates it.\n\nCurrent plan:\n${planContext}`,
     },
     ...messages.map(({ role, content }) => ({ role, content })),
   ];
@@ -184,7 +148,7 @@ router.post("/reflow/chat", async (req, res): Promise<void> => {
 
     if (functionName === "prepare_week_reflow" && hasReflowIntent) {
       try {
-        const validation = validatePlanProposal(week, JSON.parse(functionArguments));
+        const validation = validatePlanProposal(week, proposalFromTool(JSON.parse(functionArguments)));
         if (validation.ok) {
           res.write(`data: ${JSON.stringify({ type: "reflow_ready", update: validation.proposal })}\n\n`);
           reflowReadySent = true;
