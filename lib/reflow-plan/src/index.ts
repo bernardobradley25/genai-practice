@@ -2,7 +2,7 @@ export type Session = {
   id: string;
   day: string;
   shortDay: string;
-  sport: 'Run' | 'Soccer' | 'Surf' | 'Strength';
+  sport: 'Run' | 'Soccer' | 'Surf' | 'Swim' | 'Strength';
   title: string;
   detail: string;
   time: string;
@@ -35,7 +35,7 @@ export const initialWeek: Session[] = [
 ];
 
 export const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-const editableStatuses = ['planned', 'moved', 'missed', 'rest'];
+const editableStatuses = ['planned', 'moved', 'missed', 'rest', 'done'];
 
 export function summarizeWeek(sessions: Session[]) {
   const active = sessions.filter((session) => !['missed', 'rest'].includes(session.status));
@@ -44,6 +44,7 @@ export function summarizeWeek(sessions: Session[]) {
     runCount: active.filter((session) => session.sport === 'Run').length,
     soccerCount: active.filter((session) => session.sport === 'Soccer').length,
     surfCount: active.filter((session) => session.sport === 'Surf').length,
+    swimCount: active.filter((session) => session.sport === 'Swim').length,
     strengthCount: active.filter((session) => session.sport === 'Strength').length,
   };
 }
@@ -70,7 +71,7 @@ export function isPlanProposal(value: unknown): value is PlanProposal {
     const change = rawChange as Record<string, unknown>;
     return typeof change.sessionId === 'string'
       && typeof change.sport === 'string'
-      && ['Run', 'Soccer', 'Surf', 'Strength'].includes(change.sport)
+      && ['Run', 'Soccer', 'Surf', 'Swim', 'Strength'].includes(change.sport)
       && typeof change.day === 'string'
       && days.includes(change.day)
       && typeof change.time === 'string'

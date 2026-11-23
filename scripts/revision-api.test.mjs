@@ -68,3 +68,20 @@ test('API caps concurrent calls and releases capacity when visitors stop',async(
  }
  assert.equal(recovered.response.status,200);
 });
+
+
+test('API offers the review tool for natural reschedule wording',async()=>{
+ const {events}=await request('Reschedule Saturday to 9:30 AM.');assert.ok(events.some(e=>e.type==='reflow_ready'));
+});
+test('API accepts ordinary agreement to a specific recommendation',async()=>{
+ const response=await fetch('http://127.0.0.1:20368/api/reflow/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'assistant',content:'I recommend marking Tuesday missed and keeping Thursday unchanged.'},{role:'user',content:'That sounds good. Please prepare the plan you recommended.'}],week:initialWeek})});
+ assert.match(await response.text(),/reflow_ready/);
+});
+test('API preserves Swim and accepts the updated calendar in follow-up chat',async()=>{
+ const {events}=await request('Replace Thursday with a 30-minute easy swim.');const proposal=events.find(e=>e.type==='reflow_ready');assert.equal(proposal?.update.changes[0].sport,'Swim');
+ const updated=initialWeek.map(s=>s.id==='thu'?{...s,...proposal.update.changes[0]}:s);
+ const response=await fetch('http://127.0.0.1:20368/api/reflow/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:'Explain my week.'}],week:updated})});assert.equal(response.status,200);await response.text();
+});
+test('API can stage an explicitly reported completed replacement activity',async()=>{
+ const {events}=await request('Mark Tuesday as completed soccer at 7 PM for 90 minutes.');const proposal=events.find(e=>e.type==='reflow_ready');assert.equal(proposal?.update.changes[0].status,'done');assert.equal(proposal?.update.changes[0].sport,'Soccer');
+});

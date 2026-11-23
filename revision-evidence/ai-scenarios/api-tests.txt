@@ -1,0 +1,23 @@
+✔ API permits a valid explicit change (45.684209ms)
+✔ API blocks strength and soccer overlap before a card is sent (4.419292ms)
+✔ API blocks an invalid time (3.776541ms)
+✔ API blocks a zero duration (3.638541ms)
+✔ API keeps exploration read only (2.916792ms)
+✔ API rejects empty input (2.496042ms)
+✔ API preserves the failure contract when AI is unavailable (3.4965ms)
+✔ API rejects whitespace-only messages before using AI (1.415375ms)
+✔ API rejects duplicate sessions in the supplied week (1.894166ms)
+✔ API accepts a nonoverlapping strength move with its stable session ID (5.136583ms)
+✔ API caps concurrent calls and releases capacity when visitors stop (325.7175ms)
+✔ API offers the review tool for natural reschedule wording (8.374416ms)
+✔ API accepts ordinary agreement to a specific recommendation (5.275ms)
+✔ API preserves Swim and accepts the updated calendar in follow-up chat (6.073292ms)
+✔ API can stage an explicitly reported completed replacement activity (2.646625ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 493.421333

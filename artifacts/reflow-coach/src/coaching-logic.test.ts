@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { applyPlanProposal, initialWeek, validatePlanProposal, isSameWeek, parseStartTime, parseDuration, summarizeWeek, groupWeekByDay, proposalHistory } from './coaching-logic.ts';
+import { hasClearReflowIntent, proposalFromTool } from '../../api-server/src/lib/reflow-contract.ts';
 import { ChatBudget } from '../../api-server/src/lib/chat-budget.ts';
 
 const discussedMove = {
@@ -182,4 +183,53 @@ test('demo request budget does not refill on release and resets after its time w
   const first = budget.acquire(1000); assert.ok(first.ok); first.release();
   assert.deepEqual(budget.acquire(1001), { ok: false, retryAfter: 1 });
   assert.equal(budget.acquire(2000).ok, true);
+});
+
+
+const recommendedPlan = { role: 'assistant', content: 'I recommend marking Tuesday missed and keeping Thursday and Saturday as planned. Do you like this plan?' };
+for (const content of [
+  'That sounds good. Please prepare the plan you recommended.',
+  'Yes, prepare that plan for review.',
+  'I’m good with that.',
+  'Reschedule Saturday to 9:30 AM.',
+  'Could you please move Saturday to 9:30 AM?',
+  "Prepare the plan for review, but do not apply it yet.",
+]) {
+  test(`stages clear review intent: ${content}`, () => assert.equal(hasClearReflowIntent([recommendedPlan,{role:'user',content}]),true));
+}
+for (const content of [
+  "Yes, but don't change Thursday yet. I am still deciding; no proposal please.",
+  'What if I moved Thursday to Sunday?',
+  'Maybe, prepare it only after I decide.',
+  'Do not prepare any changes.',
+  'Yes, except I am worried about Thursday.',
+]) {
+  test(`keeps uncertainty or refusal read-only: ${content}`, () => assert.equal(hasClearReflowIntent([recommendedPlan,{role:'user',content}]),false));
+}
+test('agreement to a greeting is not agreement to a specific plan',()=>{
+ assert.equal(hasClearReflowIntent([{role:'assistant',content:'How can I help?'},{role:'user',content:'Sounds good.'}]),false);
+});
+test('clear agreement still works if the model forgot its closing question',()=>{
+ assert.equal(hasClearReflowIntent([{role:'assistant',content:'I recommend marking Tuesday missed; keep Thursday and Saturday unchanged.'},{role:'user',content:'That sounds good.'}]),true);
+});
+test('keyed travel replacement has one final edit per session and preserves completed Monday',()=>{
+ const {sessionId,...strength}=strengthMove;
+ const keyed={mon:null,tue:{...strength,sport:'Run',day:'Tuesday',status:'rest'},wed:{...strength,sport:'Surf',day:'Wednesday',time:'9:00 AM',title:'Easy surf',detail:'60 min · easy'},thu:{...strength,sport:'Run',day:'Thursday',status:'rest'},fri:{...strength,day:'Friday',time:'5:30 PM',detail:'30 min · bodyweight'},sat:{...strength,sport:'Surf',day:'Saturday',time:'9:00 AM',title:'Easy surf',detail:'60 min · easy'},sun:null};
+ const result=validatePlanProposal(initialWeek,proposalFromTool({impact:'Travel week',changes:keyed}));
+ assert.ok(result.ok);assert.equal(result.proposal.changes.length,5);assert.equal(summarizeWeek(result.week).surfCount,2);assert.deepEqual(result.week[0],initialWeek[0]);
+});
+test('tool parser refuses array edits and unknown IDs rather than hiding conflicts',()=>{
+ assert.throws(()=>proposalFromTool({impact:'test',changes:[strengthMove,strengthMove]}));
+ assert.throws(()=>proposalFromTool({impact:'test',changes:{other:strengthMove}}));
+});
+test('swimming stays Swim in the calendar and counts as sport rather than running',()=>{
+ const result=validatePlanProposal(initialWeek,proposalFor([{sessionId:'thu',sport:'Swim',day:'Thursday',time:'6:30 PM',title:'Easy swim',detail:'30 min · easy',status:'moved'}]));
+ assert.ok(result.ok);assert.equal(summarizeWeek(result.week).swimCount,1);assert.equal(summarizeWeek(result.week).runCount,2);assert.equal(summarizeWeek(result.week).dayCount,4);
+});
+test('recorded replacement soccer counts as completed and is protected from subsequent edits',()=>{
+ const replacement={sessionId:'tue',sport:'Soccer',day:'Tuesday',time:'7:00 PM',title:'Soccer instead of missed run',detail:'90 min elapsed · 60 active · hard',status:'done'};
+ const result=validatePlanProposal(initialWeek,proposalFor([replacement]));assert.ok(result.ok);
+ assert.equal(summarizeWeek(result.week).dayCount,4);assert.equal(summarizeWeek(result.week).soccerCount,2);
+ assert.equal(result.week.find(s=>s.id==='tue')?.status,'done');
+ assert.equal(validatePlanProposal(result.week,proposalFor([{...replacement,time:'8:00 PM'}])).ok,false);
 });
