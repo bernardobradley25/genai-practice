@@ -1,0 +1,20 @@
+Reflow public-demo polish — November 23, 2026
+Scope: fictional-athlete public demo, not saved personal plans.
+
+Design reference: Bernardo’s Reflow project, reflow-landing/design-current.md (approved October 15 direction) and existing logo/font assets. White #FFFFFF, military olive #4B5320 / #3B431B, text #2D3422, muted #626953, soft olive #F2F4E8, highlight #E2E8CF, berry #A33B54, gold #E8B931, denim #476B8E. Fraunces / DM Sans fonts are served locally; OFL notices included.
+
+Automated: 29 logic tests and 11 API integration tests pass. Full project typecheck and frontend/API builds pass. The frontend build reports the existing tooltip source-map diagnostic but exits successfully. Raw output is in polish-*-tests.txt, polish-typecheck.txt, and polish-*-build.txt.
+
+Local browser checks use real app/API with clearly labeled scripted model responses, not a live AI model:
+PASS — Stop reply immediately returns to an editable preserved draft, removes the cancelled exchange, keeps the calendar unchanged, and permits a new successful request. Fixed a discovered button-reuse/default-submit race with preventDefault and distinct keys.
+PASS — Reset week during a delayed response clears conversation/draft and retains the original week; the cancelled response does not reappear.
+PASS — Dismiss strength proposal, then ask for proposal status: sent history explicitly states dismissed by the athlete; not applied, with the exact changes.
+PASS — Move Friday strength after Wednesday soccer at 8:30 PM. Review card shows four run/sport days with named weekdays; calendar groups both sessions on Wednesday in time order and Friday has no session. Undo restores Friday at 5:30 PM.
+PASS — 320px and 390px mobile widths and 1366px desktop width: document width equals viewport, no content extends right. Mobile original/proposed comparison stacks clearly; both approval and dismissal buttons are readable. Apply and undo verified at 320px.
+PASS — Keyboard skip link focuses coach-heading. Textarea is labeled; chat log, alert errors, and explicit button names are exposed in accessibility tree. Page zoom restriction removed. This is a focused browser check, not a complete assistive-technology audit.
+PASS — Final computed desktop styles: Fraunces heading, DM Sans body, white background, #D5D8C9 card border, #626953 muted text. Fixed a color-token collision with the component library.
+PASS — Final browser console check showed no errors on normal flow. Historical simulated service failures are intentional test cases.
+
+API capacity test: three delayed requests occupy slots; fourth returns 429 and Retry-After: 15; aborting the delayed requests restores capacity and the next request succeeds. Unit checks cover hourly reset and idempotent release.
+
+Limits: per-process controls do not establish a durable spending ceiling across restarts/instances. No accounts, saved plans, coaching validation, or fresh independent human usability study. Generated explanations may still be wrong. Deployment/live AI verification is recorded after publication.

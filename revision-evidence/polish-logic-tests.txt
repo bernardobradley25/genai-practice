@@ -1,0 +1,38 @@
+$ node --experimental-strip-types --test src/coaching-logic.test.ts
+✔ commits a staged Reflow while preserving the original plan object (0.903792ms)
+✔ rejects an overlapping run/sport schedule proposal (0.087875ms)
+✔ rejects unknown sessions and attempts to change a completed workout (0.065625ms)
+✔ commits a travel-week Reflow with more than three changes and a Surf session (0.134625ms)
+✔ counts Surf toward the five-day run/sport limit (0.058375ms)
+✔ blocks the reproduced soccer and strength overlap and explains it (0.487625ms)
+✔ detects partial overlap even when start times differ (0.045084ms)
+✔ allows back-to-back sessions at the exact end boundary (0.04775ms)
+✔ rejects invalid active start time "25:99 PM" (0.065209ms)
+✔ rejects invalid active start time "" (0.08275ms)
+✔ rejects invalid active start time "Open" (0.04275ms)
+✔ rejects invalid active start time "13:00 PM" (0.042667ms)
+✔ rejects invalid active start time "6:60 PM" (0.027625ms)
+✔ rejects invalid active duration "0 min" (0.032916ms)
+✔ rejects invalid active duration "-5 min" (0.02025ms)
+✔ rejects invalid active duration "moderate" (0.027584ms)
+✔ rejects invalid active duration "75–60 min" (0.0345ms)
+✔ rejects invalid active duration "0–30 min" (0.019875ms)
+✔ uses the upper duration bound when checking overlaps (0.042542ms)
+✔ rejects sessions crossing midnight (0.02325ms)
+✔ allows missed and rest entries without an active time or duration (0.023666ms)
+✔ rejects duplicate edits to the same session (0.019292ms)
+✔ detects stale proposals even when the new week is independently valid (0.048042ms)
+✔ parses noon, midnight, 24-hour times, and minute ranges (0.019708ms)
+✔ calculates three actual sport days after a missed run without counting strength (0.078625ms)
+✔ groups a moved session on its new day while preserving every day and stable ID (0.084375ms)
+✔ proposal history includes the exact changes and dismissal state within the message budget (0.069667ms)
+✔ demo capacity limits concurrency and releases exactly once (0.056833ms)
+✔ demo request budget does not refill on release and resets after its time window (0.027416ms)
+ℹ tests 29
+ℹ suites 0
+ℹ pass 29
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 84.384542

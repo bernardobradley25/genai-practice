@@ -1,0 +1,19 @@
+✔ API permits a valid explicit change (42.945708ms)
+✔ API blocks strength and soccer overlap before a card is sent (3.833041ms)
+✔ API blocks an invalid time (3.5815ms)
+✔ API blocks a zero duration (2.971917ms)
+✔ API keeps exploration read only (3.115166ms)
+✔ API rejects empty input (2.426208ms)
+✔ API preserves the failure contract when AI is unavailable (2.58325ms)
+✔ API rejects whitespace-only messages before using AI (1.141875ms)
+✔ API rejects duplicate sessions in the supplied week (1.545958ms)
+✔ API accepts a nonoverlapping strength move with its stable session ID (5.385875ms)
+✔ API caps concurrent calls and releases capacity when visitors stop (325.307209ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 473.666666

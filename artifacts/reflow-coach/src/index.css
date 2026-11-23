@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
+@import './fonts.css';
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @plugin "@tailwindcss/typography";
@@ -31,12 +31,12 @@
 }
 
 :root {
-  --background: 42 32% 96%;
-  --foreground: 166 23% 17%;
+  --background: 0 0% 100%;
+  --foreground: 83 21% 17%;
   --card: 43 33% 99%;
-  --card-foreground: 166 23% 17%;
+  --card-foreground: 83 21% 17%;
   --popover: 43 33% 99%;
-  --popover-foreground: 166 23% 17%;
+  --popover-foreground: 83 21% 17%;
   --primary: 161 35% 29%;
   --primary-foreground: 45 45% 97%;
   --secondary: 42 28% 90%;
@@ -52,8 +52,8 @@
   --ring: 161 35% 29%;
   --radius: 1rem;
   --app-font-sans: 'DM Sans', sans-serif;
-  --app-font-serif: 'Manrope', sans-serif;
-  --app-font-mono: 'DM Mono', monospace;
+  --app-font-serif: 'Fraunces', Georgia, serif;
+  --app-font-mono: 'DM Sans', sans-serif;
 }
 
 .dark {
@@ -84,9 +84,7 @@ body {
   margin: 0;
   min-width: 320px;
   color: hsl(var(--foreground));
-  background:
-    radial-gradient(ellipse at 6% 0%, rgba(205, 220, 200, .48), transparent 28rem),
-    hsl(var(--background));
+  background: #FFFFFF;
   font-family: var(--app-font-sans);
   -webkit-font-smoothing: antialiased;
 }

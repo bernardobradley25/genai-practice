@@ -6,7 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import NotFound from '@/pages/not-found';
 import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
-import { initialWeek, type Session } from './coaching-logic';
+import { initialWeek, summarizeWeek, groupWeekByDay, type Session } from './coaching-logic';
 import { CoachChat } from './components/coach-chat';
 import { Activity, CalendarDays, Check, Clock3, Dumbbell, Footprints, Info, RotateCcw, Waves } from 'lucide-react';
 
@@ -20,26 +20,23 @@ function sportIcon(sport: Session['sport']) {
 function App() {
   const [week, setWeek] = useState<Session[]>(initialWeek);
   const [conversationVersion, setConversationVersion] = useState(0);
+  const [previousWeek, setPreviousWeek] = useState<Session[] | null>(null);
 
   const reset = () => {
     setWeek(initialWeek);
+    setPreviousWeek(null);
     setConversationVersion((version) => version + 1);
   };
 
-  const activeSessions = week.filter((session) => session.status !== 'rest' && session.status !== 'missed');
-  const dayCount = activeSessions.filter((session) => session.sport !== 'Strength').length;
-  const runCount = activeSessions.filter((session) => session.sport === 'Run').length;
-  const soccerCount = activeSessions.filter((session) => session.sport === 'Soccer').length;
-  const surfCount = activeSessions.filter((session) => session.sport === 'Surf').length;
-  const strengthCount = activeSessions.filter((session) => session.sport === 'Strength').length;
+  const { dayCount, runCount, soccerCount, surfCount, strengthCount } = summarizeWeek(week);
 
   return (
     <div className="app-shell">
+      <a className="skip-link" href="#coach-heading">Skip to the coach</a>
       <header className="topbar">
         <div className="topbar-inner">
           <a className="brand" href="/" aria-label="Reflow home" data-testid="link-home">
-            <span className="brand-mark"><Activity size={19} strokeWidth={2.2} /></span>
-            <span className="brand-name">reflow<span>.</span></span>
+            <img className="brand-logo" src="/assets/reflow-logo.svg" alt="Reflow" width="140" height="40" />
           </a>
           <div className="header-meta">
             <span className="week-label"><span className="live-dot" /> TRAINING DESK</span>
@@ -56,14 +53,15 @@ function App() {
         <section className="intro enter">
           <div className="intro-copy">
             <div className="eyebrow"><span className="eyebrow-line" /> YOUR TRAINING, IN CONTEXT</div>
-            <h1 className="display">Make room for<br className="desktop-break" /> <em>real life.</em></h1>
+            <h1 className="display">Make room for<br className="desktop-break" /> real life.</h1>
             <p className="intro-text">A practical plan for the whole week—not a pile of sessions competing for space.</p>
             <p className="reviewer-links">Try a sample below, discuss a change, then review the original and proposed sessions before applying it. <a href="https://github.com/bernardobradley25/genai-practice#readme" target="_blank" rel="noreferrer">Instructions and test results</a> · <a href="https://github.com/bernardobradley25/genai-practice" target="_blank" rel="noreferrer">GitHub source</a></p>
+            <nav className="workspace-nav" aria-label="Workspace sections"><a href="#coach-heading">Talk to the coach ↓</a><a href="#week-heading">View your week</a></nav>
           </div>
           <div className="athlete-card">
             <div className="avatar">JM</div>
-            <div className="athlete-info"><strong>Jordan M.</strong><span>Fictional sample · adult amateur</span></div>
-            <span className="week-chip">WEEK 24</span>
+            <div className="athlete-info"><strong>Jordan M.</strong><span>Fictional athlete · interactive demo</span></div>
+            <span className="week-chip">SAMPLE WEEK</span>
           </div>
         </section>
 
@@ -72,7 +70,7 @@ function App() {
             <div className="panel-heading">
               <div>
                 <div className="section-kicker"><CalendarDays size={14} /> THE WHOLE ROUTINE</div>
-                <h2 className="display" id="week-heading">This week, at a glance</h2>
+                <h2 className="display" id="week-heading" tabIndex={-1}>This week, at a glance</h2>
               </div>
               <div className="load-indicator"><span className="load-number">{dayCount}<small> / 5</small></span><span className="load-caption">run + sport days</span></div>
             </div>
@@ -82,18 +80,20 @@ function App() {
               <span><i>CAP</i> 5 run / sport days</span>
             </div>
             <div className="week-grid" data-testid="week-plan">
-              {week.map((session) => (
-                <article className={`day-card ${session.status === 'rest' ? 'day-rest' : ''} ${session.status === 'moved' ? 'day-moved' : ''} ${session.status === 'missed' ? 'day-missed' : ''}`} key={session.id} data-testid={`session-${session.id}`}>
+              {groupWeekByDay(week).map(({ day, sessions }) => (
+                <article className={`day-card ${sessions.every((session) => session.status === 'rest') ? 'day-rest' : ''}`} key={day} aria-label={day} data-testid={`day-${day.toLowerCase()}`}>
                   <div className="day-top">
-                    <span className="day-name">{session.shortDay}</span>
-                    {session.status === 'done' && <span className="done-dot" aria-label="Completed"><Check size={11} /></span>}
+                    <span className="day-name">{day.slice(0, 3).toUpperCase()}</span>
                   </div>
+                  {sessions.length === 0 && <p className="rest-caption">No session planned</p>}
+                  {sessions.filter((session) => session.status !== 'rest' || sessions.every((item) => item.status === 'rest')).map((session) => <div className={`calendar-session ${session.status === 'missed' ? 'session-missed' : ''}`} key={session.id} data-testid={`session-${session.id}`}>
                   {session.status === 'rest' ? (
                     <div className="rest-mark"><span className="rest-rule" /><span>open</span></div>
                   ) : (
                     <>
                       <div className={`sport-icon sport-${session.sport.toLowerCase()}`}>{sportIcon(session.sport)}</div>
                       <h3>{session.title}</h3>
+                      {session.status === 'done' && <span className="session-status"><Check size={12} /> Completed</span>}
                       <p className="session-detail">{session.detail}</p>
                       <div className="session-time"><Clock3 size={12} /> {session.time}</div>
                       {session.status === 'moved' && <span className="moved-tag" data-testid="status-session-moved">MOVED</span>}
@@ -101,9 +101,11 @@ function App() {
                     </>
                   )}
                   {session.status === 'rest' && <p className="rest-caption">{session.title}</p>}
+                  </div>)}
                 </article>
               ))}
             </div>
+            {previousWeek && <button className="undo-button" type="button" onClick={() => { setWeek(previousWeek); setPreviousWeek(null); }}><RotateCcw size={14} /> Undo last change</button>}
             <div className="plan-foot">
               <div className="legend">
                 <span><i className="legend-dot run-dot" /> Run</span>
@@ -121,20 +123,20 @@ function App() {
                 <div className="coach-glyph"><Activity size={18} /></div>
                 <div>
                   <div className="section-kicker">REFLOW COACH <span className="ai-dot" /> LIVE AI</div>
-                  <h2 className="display" id="coach-heading">Let’s work through it.</h2>
+                  <h2 className="display" id="coach-heading" tabIndex={-1}>Let’s work through it.</h2>
                 </div>
               </div>
             </div>
             <CoachChat
               key={conversationVersion}
               week={week}
-              setWeek={setWeek}
+              setWeek={(nextWeek) => { setPreviousWeek(week); setWeek(nextWeek); }}
               conversationKey={conversationVersion}
               onNewConversation={() => setConversationVersion((version) => version + 1)}
             />
             <div className="coach-foot">
               <span className="ai-mark"><span /> AI conversation</span>
-              <span>Uses Replit AI credits · chat stays in this tab</span>
+              <span>Changes reset when you refresh</span>
             </div>
           </section>
         </div>

@@ -25,8 +25,9 @@ app.use(
     },
   }),
 );
-app.use(cors());
-app.use(express.json());
+app.disable("x-powered-by");
+app.use(cors({ origin: ["https://reflow-training-coach.replit.app", "http://127.0.0.1:20368", "http://localhost:20368"] }));
+app.use(express.json({ limit: "96kb" }));
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", router);
