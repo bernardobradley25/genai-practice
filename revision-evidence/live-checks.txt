@@ -1,0 +1,34 @@
+Reflow live revision verification
+Date: November 23, 2026 (America/Indiana/Indianapolis)
+Public URL: https://reflow-training-coach.replit.app/
+Application commit: b5598d5ec974642de31d44e4b26f5448619c9a45
+Revision PR: https://github.com/bernardobradley25/genai-practice/pull/1 (merged)
+Performed by: Codex using Chrome and the real Replit managed AI service.
+
+Deployment
+- Fast-forwarded Replit main to the merged revision; retained its two pre-existing attachment deletions.
+- pnpm install --frozen-lockfile and full project type checking passed in Replit.
+- Replit publish log reported Deployment successful at 2026-11-23T22:55:26Z.
+- Reloading the public URL showed the new instructions, repository links, sample prompts, and comparison cards.
+
+1. Original overlap regression: PASS
+Input: Move Friday's strength and mobility to Wednesday at 7:15 PM, and keep Wednesday's club soccer at 7:15 PM too. Prepare this exact plan for review.
+Observed: Coach explained the simultaneous-session conflict and requested another time/day. No proposal or apply button appeared. Calendar remained unchanged.
+Evidence: live-conflict-blocked.jpg
+
+2. Valid proposal, dismissal, and explicit application: PASS
+Input: Mark Tuesday's 35-minute run missed and replace Thursday's steady run with a 35-minute easy run at 6:30 PM; keep all other sessions unchanged.
+Observed: Original/proposed comparison appeared while calendar remained unchanged. Keep current week dismissed it without applying changes. A fresh proposal was requested; Reflow the week marked Tuesday missed and changed Thursday to 35 minutes easy at 6:30 PM. Other sessions stayed unchanged; calendar count became 3/5.
+Evidence: live-proposal-review.jpg and live-valid-apply.jpg
+Remaining defect: The second AI-generated explanation said four run/sport days while enumerating Wednesday, Thursday, Saturday (three). The calendar's deterministic count correctly showed three. This is not a passing result for narrative arithmetic.
+
+3. Incomplete soccer substitution: PASS
+Input: I skipped Tuesday's run and played soccer instead. Does that replace the run?
+Observed: Coach asked for active playing time, perceived effort, and continuous versus sprint/stop-start play before a confident load comparison. No proposal appeared; calendar unchanged.
+Evidence: live-missing-details.jpg
+
+4. Blank input and reset: PASS
+Observed: Send disabled for empty composer; Reset week restored the initial fictional schedule and cleared the test conversation.
+
+Scope
+These are observed scenario checks, not independent peer usability research or validation of coaching accuracy. Model outputs may vary. Automated 24 logic/7 API tests and earlier local browser checks used scripted upstream responses; their fixture evidence is separately labeled.

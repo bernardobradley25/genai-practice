@@ -6,7 +6,7 @@ Reflow is a prototype coaching experience for adult amateur athletes balancing r
 
 **Reviewer links:** [Live prototype](https://reflow-training-coach.replit.app) · [GitHub source](https://github.com/bernardobradley25/genai-practice) · [Revision branch](https://github.com/bernardobradley25/genai-practice/tree/fix/prototype-revision)
 
-**Release status:** The revision has been implemented and verified locally on `fix/prototype-revision`. Replit sign-in and publishing are still required. The live URL is the earlier deployment until republished; do not use it as evidence that these fixes are already live.
+**Release status:** Published and verified on November 23, 2026. [PR #1](https://github.com/bernardobradley25/genai-practice/pull/1) is merged into `main`; Replit deployed application commit `b5598d5`. The existing live URL serves the revision. Subsequent documentation commits record the live results.
 
 ### Feedback and response
 
@@ -24,17 +24,17 @@ The revision puts instructions and repository links inside the app, adds sample 
 
 ### Revision test results
 
-Verification date: November 23, 2026. **24 logic tests and 7 API integration tests passed.** Project type checking, frontend build, and API build passed. Browser checks used the revised frontend and actual API with a deterministic local OpenAI-compatible fixture. They did not call a live model or use Replit credits. The original deployed app was tested with live AI before revision.
+Verification date: November 23, 2026. **24 logic tests and 7 API integration tests passed.** Project type checking, frontend build, and API build passed. Browser checks used the revised frontend and actual API with a deterministic local OpenAI-compatible fixture. They did not call a live model or use Replit credits. The original deployed app was tested with live AI before revision. Post-publication checks also exercised the revised live AI app; see [the live verification record](revision-evidence/live-checks.txt).
 
 | Test | Input or action | Observed result | Result |
 | --- | --- | --- | --- |
-| Typical change | Miss Tuesday’s run; replace Thursday’s steady run with 35 minutes easy at 6:30 PM | Original/proposed values appeared; the week stayed unchanged until “Reflow the week,” then updated | Pass, local browser and API |
-| Challenge case | Move strength onto Wednesday soccer at 7:15 PM | Original deployment accepted the conflict. Revised API returned a specific overlap error without a proposal; the week stayed unchanged | Fixed, live baseline and local browser/API |
+| Typical change | Miss Tuesday’s run; replace Thursday’s steady run with 35 minutes easy at 6:30 PM | Original/proposed values appeared; the week stayed unchanged until “Reflow the week,” then updated | Pass, local browser/API and revised live AI |
+| Challenge case | Move strength onto Wednesday soccer at 7:15 PM | Original deployment accepted the conflict. Revised API returned a specific overlap error without a proposal; the week stayed unchanged | Fixed, baseline/local checks and revised live AI refusal |
 | Invalid time | Propose 25:99 PM or an empty active start time | Validator rejected both; API integration rejected 25:99 PM | Pass, logic/API |
 | Invalid duration | Propose zero minutes, negative minutes, missing duration, or a reversed range | Rejected; API integration rejected zero minutes | Pass, logic/API |
-| User rejects | Click “Keep current week” | Proposal dismissed; current week unchanged | Pass, local browser |
+| User rejects | Click “Keep current week” | Proposal dismissed; current week unchanged | Pass, local and live browser |
 | Outdated proposal | Prepare two proposals and apply one | Remaining proposal disabled with an explanation that the week changed | Pass, local browser |
-| Incomplete soccer description | Ask whether unspecified soccer replaces Tuesday’s run | Original live coach asked about active minutes, effort, and stop-start play before recommending a change | Pass, baseline live AI only |
+| Incomplete soccer description | Ask whether unspecified soccer replaces Tuesday’s run | Original live coach asked about active minutes, effort, and stop-start play before recommending a change | Pass, original and revised live AI |
 | Empty input and service failure | Send empty API content; simulate unavailable AI | API returned 400 for empty input and 503 with unchanged-plan message for service failure; blank browser send was disabled | Pass, API/browser |
 | Existing protections | Attempt to alter completed work, exceed the cap, duplicate edits, or use unknown session IDs | Rejected; existing travel and valid schedule tests still passed | Pass, logic |
 
@@ -61,13 +61,13 @@ node --experimental-strip-types --test scripts/revision-api.test.mjs
 
 ### AI use disclosure for this revision
 
-The product concept and intended coaching flow came from Bernardo Moreira’s prior work. For this revision, Bernardo asked Codex to investigate the feedback, fix the identified issues, and prepare the submission. Codex inspected Canvas attempts and anonymous comments, reviewed the repository, tested the original live app, implemented the shared validator and interface changes, authored and ran regression tests, checked the revised browser flow, and drafted the README, report, and disclosure. This was substantial AI assistance with implementation, testing, and writing; it was not limited to editing wording. Bernardo still needs to review the package and authorize the Replit login needed for publication.
+The product concept and intended coaching flow came from Bernardo Moreira’s prior work. For this revision, Bernardo asked Codex to investigate the feedback, fix the identified issues, and prepare the submission. Codex inspected Canvas attempts and anonymous comments, reviewed the repository, tested the original live app, implemented the shared validator and interface changes, authored and ran regression tests, checked the revised browser flow, and drafted the README, report, and disclosure. This was substantial AI assistance with implementation, testing, and writing; it was not limited to editing wording. After Bernardo authorized the Replit account, Codex merged and published the tested revision and performed live verification. The reported checks are AI-assisted verification, not independent human evaluation. Bernardo remains responsible for reviewing the package before submission.
 
 Representative requests were to find the feedback independently, fix Reflow’s scheduling issues, and prepare the revision with test results and AI disclosure. Testing used a fictional athlete. The original app uses Replit’s managed OpenAI integration for live conversation; the revised local integration tests used scripted model responses against the actual application code. These fixtures verify application behavior, not coaching accuracy or fitness outcomes.
 
 ### Remaining limitations
 
-This is one fictional week with no accounts or saved plans. Durations must start with minutes (for example, “35 min”); overnight sessions and multiple run/sport sessions on one day remain unsupported. User availability and training intensity are discussed by the AI but are not represented as fully enforceable scheduling constraints. There is no reviewed training-reference set, medical validation, or fresh independent user evaluation. Live post-deployment AI checks are still pending.
+This is one fictional week with no accounts or saved plans. Durations must start with minutes (for example, “35 min”); overnight sessions and multiple run/sport sessions on one day remain unsupported. User availability and training intensity are discussed by the AI but are not represented as fully enforceable scheduling constraints. There is no reviewed training-reference set, medical validation, or fresh independent user evaluation. Live checks revealed one generated explanation that said four activity days while listing three. The deterministic calendar correctly showed three; AI explanations can still contain arithmetic errors. The live scenario checks do not establish coaching accuracy.
 
 ## MVP: what it does
 
