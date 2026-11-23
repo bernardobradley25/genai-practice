@@ -74,7 +74,7 @@ test('API offers the review tool for natural reschedule wording',async()=>{
  const {events}=await request('Reschedule Saturday to 9:30 AM.');assert.ok(events.some(e=>e.type==='reflow_ready'));
 });
 test('API accepts ordinary agreement to a specific recommendation',async()=>{
- const response=await fetch('http://127.0.0.1:20368/api/reflow/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'assistant',content:'I recommend marking Tuesday missed and keeping Thursday unchanged.'},{role:'user',content:'That sounds good. Please prepare the plan you recommended.'}],week:initialWeek})});
+ const response=await fetch('http://127.0.0.1:20368/api/reflow/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'assistant',content:'I recommend marking Tue missed and keeping Thu unchanged.'},{role:'user',content:'That sounds good. Please prepare the plan you recommended.'}],week:initialWeek})});
  assert.match(await response.text(),/reflow_ready/);
 });
 test('API preserves Swim and accepts the updated calendar in follow-up chat',async()=>{

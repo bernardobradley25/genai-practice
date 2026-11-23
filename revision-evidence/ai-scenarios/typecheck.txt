@@ -7,5 +7,5 @@ artifacts/reflow-coach typecheck$ tsc -p tsconfig.json --noEmit
 scripts typecheck$ tsc -p tsconfig.json --noEmit
 scripts typecheck: Done
 artifacts/api-server typecheck: Done
-artifacts/mockup-sandbox typecheck: Done
 artifacts/reflow-coach typecheck: Done
+artifacts/mockup-sandbox typecheck: Done

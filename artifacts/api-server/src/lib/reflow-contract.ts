@@ -9,16 +9,16 @@ export function hasClearReflowIntent(messages: Array<{ role: string; content: st
     || /\bno\s+(?:proposal|changes?|edits?)\b/.test(text)) return false;
 
   const edit = '(?:prepare|stage|reflow|reschedule|apply|make|update|change|move|replace|switch|add|shorten|extend|skip|mark|set|cancel|remove)';
-  const polite = "(?:(?:please|can you|could you|would you|let's)\\s+)*";
+  const polite = "(?:(?:please|can you|could you|would you|let's|actually,)\\s+)*";
   if (new RegExp('^' + polite + edit + '\\b').test(text)
     || new RegExp("^(?:i want you to|i want to|i'd like you to|i'd like to)\\s+" + edit + '\\b').test(text)) return true;
 
   const previous = messages.slice(0, -1).reverse().find(message => message.role === 'assistant')?.content ?? '';
   // A specific recommendation is enough context even if the model forgot its closing question.
-  const hasPlan = /\b(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\b/i.test(previous)
+  const hasPlan = /\b(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|Mon|Tue|Tues|Wed|Thu|Thur|Thurs|Fri|Sat|Sun)\b/i.test(previous)
     && /\b(?:keep|mark|move|replace|shorten|extend|skip|rest|cancel|recommend|plan)\b/i.test(previous);
   if (!hasPlan || /\b(?:but|except|although)\b/.test(text)) return false;
-  return /^(?:(?:that|this|it) (?:sounds|looks) good|(?:that|this) works(?: for me)?|sounds good|looks good|i (?:really )?like (?:the|this|that) plan|i like (?:it|that)|i(?:'m| am) (?:happy with (?:this|the) plan|good with that)|i agree|i approve|i choose|yes|yeah|yep|sure|okay|ok|go ahead|do it|do that|let's (?:do it|do that|go with|proceed)|i(?:'ll| will) (?:go with|take)|let's take|take (?:the )?(?:first|second|third|option))\b/i.test(text);
+  return /^(?:that(?:'s| is) good|perfect|great|works for me|agreed|approved|(?:that|this|it) (?:sounds|looks) good|(?:that|this) works(?: for me)?|sounds good|looks good|i (?:really )?like (?:the|this|that) plan|i like (?:it|that)|i(?:'m| am) (?:happy with (?:this|the) plan|good with that)|i agree|i approve|i choose|yes|yeah|yep|sure|okay|ok|go ahead|do it|do that|let's (?:do it|do that|go with|proceed)|i(?:'ll| will) (?:go with|take)|let's take|take (?:the )?(?:first|second|third|option))\b/i.test(text);
 }
 
 const sessionIds = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];

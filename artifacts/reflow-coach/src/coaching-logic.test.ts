@@ -233,3 +233,13 @@ test('recorded replacement soccer counts as completed and is protected from subs
  assert.equal(result.week.find(s=>s.id==='tue')?.status,'done');
  assert.equal(validatePlanProposal(result.week,proposalFor([{...replacement,time:'8:00 PM'}])).ok,false);
 });
+
+
+test('approval recognizes the abbreviated weekdays used in a live travel recommendation',()=>{
+ const recommendation={role:'assistant',content:'Mon: completed strength unchanged. Tue: rest. Wed: Surf 60 min. Fri: strength 30 min. Sat: Surf 60 min. Do you like this plan?'};
+ for(const content of ['Yes, prepare that plan for review.', 'Perfect.', 'That’s good.', 'Works for me.'])assert.equal(hasClearReflowIntent([recommendation,{role:'user',content}]),true);
+});
+test('short weekday names do not bypass qualified-agreement protection',()=>{
+ const recommendation={role:'assistant',content:'Keep Mon strength, replace Wed soccer with Surf and rest Thu.'};
+ assert.equal(hasClearReflowIntent([recommendation,{role:'user',content:"Perfect, but do not prepare it yet."}]),false);
+});

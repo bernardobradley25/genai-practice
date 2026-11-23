@@ -10,6 +10,7 @@ const cases=[
  {id:'soccer-substitution',steps:["I skipped Tuesday’s easy run and played soccer instead. Does that count as the run?", "The soccer was Tuesday at 7 PM: 60 active minutes in a 90-minute game, effort 8 out of 10, lots of sprints and stops. I am not sore. Wednesday club training is still planned.", "Yes, prepare your recommended plan for review."]},
  {id:'travel-surf',steps:["I’m away Tuesday through Sunday. No running or soccer. I can surf Wednesday and Saturday at 9 AM for 60 minutes at easy effort, and do 30 minutes bodyweight strength Friday at 5:30 PM. Monday strength is already completed. What plan fits?", "Yes, prepare that plan for review."]},
  {id:'natural-reschedule',steps:["Reschedule Saturday’s long easy run to 9:30 AM on Saturday. Keep its 60-minute duration and everything else unchanged."]},
+ {id:'half-session',steps:["I missed Tuesday’s 35-minute easy run. I want half of that duration on Thursday at 6:30 PM, replacing Thursday’s steady run, not adding a second run. Keep Saturday unchanged. What exact duration and plan is that?", "Yes, prepare that half-session replacement for review."]},
  {id:'hypothetical',steps:["What if I moved Thursday’s run to Sunday? I am just comparing options; do not prepare changes yet."]},
  {id:'unsupported-swimming',steps:["Replace Thursday’s run with a 30-minute easy swim at 6:30 PM. Keep every other session unchanged. Prepare the change for review."]},
  {id:'unsupported-cycling',steps:["Replace Thursday’s run with a 30-minute easy bike ride at 6:30 PM. Prepare it for review."]},
