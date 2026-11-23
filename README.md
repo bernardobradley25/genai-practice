@@ -6,7 +6,7 @@ Reflow is a prototype coaching experience for adult amateur athletes balancing r
 
 **Reviewer links:** [Live prototype](https://reflow-training-coach.replit.app) · [GitHub source](https://github.com/bernardobradley25/genai-practice)
 
-**Release status:** The initial revision in [PR #1](https://github.com/bernardobradley25/genai-practice/pull/1) was published and verified on November 23, 2026. The public-demo polish below has passed local checks and is prepared for deployment. Publication evidence is recorded separately after live verification.
+**Release status:** Published and verified on November 23, 2026. The initial revision in [PR #1](https://github.com/bernardobradley25/genai-practice/pull/1) and public-demo polish in [PR #2](https://github.com/bernardobradley25/genai-practice/pull/2) are merged. Replit now serves the polished application from GitHub release commit `6d532e2`. Live checks verified branding, review/apply/undo, conflict refusal, and Stop recovery. See [the public-demo live record](revision-evidence/polish-live-checks.txt).
 
 ### Feedback and response
 

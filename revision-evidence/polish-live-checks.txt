@@ -1,0 +1,19 @@
+Reflow public-demo live verification — November 23, 2026
+URL: https://reflow-training-coach.replit.app/
+Source: PR #2 merged, application release commit 6d532e23ad1437d89dcc8830805f4cfba9795982.
+Replit merged this into its existing main as 38ecafa, preserving the two prior attachment deletions. The working tree was clean; the only difference against origin/main was those attachments. Published through the existing authorized Bbradle7 account and unchanged public URL. Replit reported Current status Live.
+
+Observed production script: /assets/index-lmKunSDc.js. Official logo at /assets/reflow-logo.svg; computed Fraunces heading, DM Sans body and white background. New fictional-demo guidance, source links, grouped calendar, and review controls visible. No console errors observed during these live checks.
+
+PASS — Asked: Move Friday’s strength + mobility to Wednesday at 8:30 PM for 40 minutes, after soccer. Keep all other sessions unchanged and prepare that exact change for review.
+The model returned a review card with the original Friday 5:30 PM and proposed Wednesday 8:30 PM sessions. The deterministic summary showed four run/sport days: Tuesday, Wednesday, Thursday, Saturday. The calendar stayed unchanged until approval. The impact explained the same-evening combined load without calling it an overlap.
+
+PASS — Clicked Reflow the week. Wednesday contained Club training (75 min, 7:15 PM), followed by Strength + mobility (40 min, 8:30 PM, MOVED). Friday showed No session planned. Clicked Undo last change: strength returned to Friday at 5:30 PM.
+
+PASS — Reset and sent the Scheduling conflict sample. The live coach refused to prepare simultaneous soccer/strength at 7:15 PM Wednesday and asked for a different time or day. No review card or calendar change occurred.
+
+PASS — Started a new chat asking to compare missed-Tuesday-run options, then clicked Stop reply while pending. The exchange was removed, draft remained editable, Send became available, and the explicit stopped/unchanged-week notice appeared. No accidental resubmission occurred.
+
+Final state: reset sample week and clean greeting. The live app remains open for Bernardo. Screenshots: polish-live-home.jpg, polish-live-applied.jpg, polish-live-conflict.jpg. Local responsive/fixture evidence remains separately labeled.
+
+This is software/live-flow verification by Codex, not independent human evaluation or validation of coaching accuracy. Generated prose can still be wrong. Public-demo per-process limits are not a durable account-wide spending cap.
