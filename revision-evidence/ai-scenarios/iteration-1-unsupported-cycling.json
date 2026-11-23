@@ -1,0 +1,85 @@
+{
+  "case": "unsupported-cycling",
+  "runAt": "2026-11-23T23:41:45.000Z",
+  "initialWeek": [
+    {
+      "id": "mon",
+      "day": "Monday",
+      "shortDay": "MON",
+      "sport": "Strength",
+      "title": "Full-body strength",
+      "detail": "45 min · moderate",
+      "time": "6:30 PM",
+      "status": "done"
+    },
+    {
+      "id": "tue",
+      "day": "Tuesday",
+      "shortDay": "TUE",
+      "sport": "Run",
+      "title": "Easy run",
+      "detail": "35 min · conversational",
+      "time": "7:00 AM",
+      "status": "planned"
+    },
+    {
+      "id": "wed",
+      "day": "Wednesday",
+      "shortDay": "WED",
+      "sport": "Soccer",
+      "title": "Club training",
+      "detail": "75 min · variable",
+      "time": "7:15 PM",
+      "status": "planned"
+    },
+    {
+      "id": "thu",
+      "day": "Thursday",
+      "shortDay": "THU",
+      "sport": "Run",
+      "title": "Steady run",
+      "detail": "40 min · controlled",
+      "time": "6:45 AM",
+      "status": "planned"
+    },
+    {
+      "id": "fri",
+      "day": "Friday",
+      "shortDay": "FRI",
+      "sport": "Strength",
+      "title": "Strength + mobility",
+      "detail": "40 min · moderate",
+      "time": "5:30 PM",
+      "status": "planned"
+    },
+    {
+      "id": "sat",
+      "day": "Saturday",
+      "shortDay": "SAT",
+      "sport": "Run",
+      "title": "Long easy run",
+      "detail": "60 min · relaxed",
+      "time": "9:00 AM",
+      "status": "planned"
+    },
+    {
+      "id": "sun",
+      "day": "Sunday",
+      "shortDay": "SUN",
+      "sport": "Run",
+      "title": "Recovery buffer",
+      "detail": "Unplanned space",
+      "time": "Open",
+      "status": "rest"
+    }
+  ],
+  "results": [
+    {
+      "prompt": "Replace Thursday’s run with a 30-minute easy bike ride at 6:30 PM. Prepare it for review.",
+      "status": 200,
+      "elapsedMs": 1333,
+      "text": "The calendar can’t represent a bike ride because Bike isn’t a supported sport. I can’t stage it as a run or another sport.",
+      "errors": []
+    }
+  ]
+}
