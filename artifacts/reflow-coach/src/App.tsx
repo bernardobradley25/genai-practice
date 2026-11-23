@@ -58,6 +58,7 @@ function App() {
             <div className="eyebrow"><span className="eyebrow-line" /> YOUR TRAINING, IN CONTEXT</div>
             <h1 className="display">Make room for<br className="desktop-break" /> <em>real life.</em></h1>
             <p className="intro-text">A practical plan for the whole week—not a pile of sessions competing for space.</p>
+            <p className="reviewer-links">Try a sample below, discuss a change, then review the original and proposed sessions before applying it. <a href="https://github.com/bernardobradley25/genai-practice#readme" target="_blank" rel="noreferrer">Instructions and test results</a> · <a href="https://github.com/bernardobradley25/genai-practice" target="_blank" rel="noreferrer">GitHub source</a></p>
           </div>
           <div className="athlete-card">
             <div className="avatar">JM</div>

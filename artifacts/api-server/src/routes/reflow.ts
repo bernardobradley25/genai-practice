@@ -1,18 +1,9 @@
 import { Router, type IRouter } from "express";
+import { validatePlanProposal } from "@workspace/reflow-plan";
 import { ReflowChatBody } from "@workspace/api-zod";
 import { openai } from "@workspace/integrations-openai-ai-server";
 
 const router: IRouter = Router();
-
-const dayNames: Record<string, string> = {
-  mon: "Monday",
-  tue: "Tuesday",
-  wed: "Wednesday",
-  thu: "Thursday",
-  fri: "Friday",
-  sat: "Saturday",
-  sun: "Sunday",
-};
 
 const prepareReflowTool = {
   type: "function" as const,
@@ -47,9 +38,9 @@ const prepareReflowTool = {
                 type: "string",
                 enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
               },
-              time: { type: "string" },
+              time: { type: "string", description: "Explicit start time such as 6:30 PM or 18:30 for an active session." },
               title: { type: "string" },
-              detail: { type: "string" },
+              detail: { type: "string", description: "For active sessions start with a positive duration in minutes, e.g. 35 min · easy or 60–75 min · moderate." },
               status: { type: "string", enum: ["planned", "moved", "missed", "rest"] },
             },
             required: ["sessionId", "sport", "day", "time", "title", "detail", "status"],
@@ -62,87 +53,6 @@ const prepareReflowTool = {
     },
   },
 };
-
-function validateProposal(
-  value: unknown,
-  week: Array<{
-    id: string;
-    day: string;
-    shortDay: string;
-    sport: string;
-    title: string;
-    detail: string;
-    time: string;
-    status: string;
-  }>,
-): { impact: string; changes: Array<{ sessionId: string; sport: string; day: string; time: string; title: string; detail: string; status: string }> } | null {
-  if (!value || typeof value !== "object") return null;
-  const proposal = value as Record<string, unknown>;
-  if (typeof proposal.impact !== "string" || proposal.impact.length > 700) return null;
-  if (!Array.isArray(proposal.changes) || proposal.changes.length < 1 || proposal.changes.length > 7) return null;
-
-  const changes: Array<{ sessionId: string; sport: string; day: string; time: string; title: string; detail: string; status: string }> = [];
-  const changedIds = new Set<string>();
-  for (const rawChange of proposal.changes) {
-    if (!rawChange || typeof rawChange !== "object") return null;
-    const change = rawChange as Record<string, unknown>;
-    if (
-      typeof change.sessionId !== "string" ||
-      typeof change.sport !== "string" ||
-      typeof change.day !== "string" ||
-      typeof change.time !== "string" ||
-      typeof change.title !== "string" ||
-      typeof change.detail !== "string" ||
-      typeof change.status !== "string"
-    ) return null;
-
-    const session = week.find((item) => item.id === change.sessionId);
-    if (
-      !session ||
-      session.status === "done" ||
-      changedIds.has(session.id) ||
-      !["Run", "Soccer", "Surf", "Strength"].includes(change.sport) ||
-      !Object.values(dayNames).includes(change.day) ||
-      !["planned", "moved", "missed", "rest"].includes(change.status) ||
-      change.time.length > 40 ||
-      change.title.length > 80 ||
-      change.detail.length > 300
-    ) return null;
-
-    changedIds.add(session.id);
-    changes.push({
-      sessionId: session.id,
-      sport: change.sport,
-      day: change.day,
-      time: change.time,
-      title: change.title,
-      detail: change.detail,
-      status: change.status,
-    });
-  }
-
-  const revisedWeek = week.map((session) => {
-    const change = changes.find((item) => item.sessionId === session.id);
-    if (!change) return session;
-    const shortDay = Object.entries(dayNames).find(([, name]) => name === change.day)?.[0];
-    return {
-      ...session,
-      sport: change.sport,
-      day: change.day,
-      shortDay: shortDay?.toUpperCase() ?? session.shortDay,
-      time: change.time,
-      title: change.title,
-      detail: change.detail,
-      status: change.status,
-    };
-  });
-  const runFieldDays = revisedWeek
-    .filter((session) => ["Run", "Soccer", "Surf"].includes(session.sport) && !["missed", "rest"].includes(session.status))
-    .map((session) => session.day);
-  if (new Set(runFieldDays).size !== runFieldDays.length || runFieldDays.length > 5) return null;
-
-  return { impact: proposal.impact, changes };
-}
 
 function hasClearReflowIntent(messages: Array<{ role: string; content: string }>): boolean {
   const latest = messages.at(-1);
@@ -183,6 +93,8 @@ Then offer two or three concrete, week-specific paths and their trade-offs witho
 Keep replies concise but allow enough room to explain a comparison and options (usually under 220 words). Use bullets when they make trade-offs easier to compare. Do not keep asking questions once the relevant details are known; move to the estimate and options. Do not certify that a schedule will achieve a goal or that a change is safe, and do not turn incomplete self-reported activity into a confident prescription.
 
 Keep exploratory options in the conversation. Recommend one best-fit option, summarize the exact schedule changes, and ask plainly, "Do you like this plan?" When the athlete clearly likes or agrees with that specific plan—or directly requests a specific schedule edit—call prepare_week_reflow to stage a validated Reflow card. Tell the athlete the week is not changed yet and invite them to click "Reflow the week" when ready. Never say the schedule is updated until that button is clicked. Do not stage a change while brainstorming, comparing, responding to hypotheticals, or when the athlete is unsure or qualifies agreement with a concern. If the athlete is still weighing options, leave the week unchanged. When moving a run or field session to an occupied day, include an appropriate change to the existing session too. Preserve completed sessions. Represent sports such as surfing accurately in the reflowed week, keep details concise, allow changes to as many as seven sessions, and check the five run/sport-day cap and conflicting run/sport days before allowing a Reflow.
+
+Never prepare overlapping sessions of any sport, including strength. Use valid explicit start times and positive durations in minutes for active sessions. For a duration range, reserve the upper end. If a requested plan conflicts, explain the conflict and ask for a feasible alternative; a warning does not make an invalid schedule acceptable.
 
 Stay within general planning support. Do not diagnose or advise on injury, rehabilitation, medication, or medical conditions; for those, say this prototype cannot guide the decision and suggest a qualified professional. Keep replies clear, conversational, and concise without sounding like a form or checklist.`;
 
@@ -236,7 +148,7 @@ router.post("/reflow/chat", async (req, res): Promise<void> => {
     let functionName = "";
     let functionArguments = "";
     let reflowReadySent = false;
-    let reflowPreparationFailed = false;
+    let reflowPreparationError: string | null = null;
     for await (const chunk of stream) {
       const delta = chunk.choices[0]?.delta;
       if (typeof delta?.content === "string") {
@@ -251,24 +163,24 @@ router.post("/reflow/chat", async (req, res): Promise<void> => {
 
     if (functionName === "prepare_week_reflow" && hasReflowIntent) {
       try {
-        const update = validateProposal(JSON.parse(functionArguments), week);
-        if (update) {
-          res.write(`data: ${JSON.stringify({ type: "reflow_ready", update })}\n\n`);
+        const validation = validatePlanProposal(week, JSON.parse(functionArguments));
+        if (validation.ok) {
+          res.write(`data: ${JSON.stringify({ type: "reflow_ready", update: validation.proposal })}\n\n`);
           reflowReadySent = true;
         } else {
-          reflowPreparationFailed = true;
+          reflowPreparationError = validation.error;
           req.log.warn("AI Reflow preparation failed schedule validation");
         }
       } catch {
-        reflowPreparationFailed = true;
+        reflowPreparationError = "The proposed schedule could not be read. Ask for a new proposal.";
         req.log.warn("AI Reflow preparation could not be parsed");
       }
     } else if (functionName === "prepare_week_reflow") {
       req.log.warn("Blocked Reflow preparation without clear athlete agreement");
     }
 
-    if (reflowPreparationFailed) {
-      res.write(`data: ${JSON.stringify({ type: "error", message: "I couldn’t safely prepare that Reflow. Your week is unchanged; tell me which specific option you want to use." })}\n\n`);
+    if (reflowPreparationError) {
+      res.write(`data: ${JSON.stringify({ type: "error", message: `${reflowPreparationError} Your week is unchanged.` })}\n\n`);
       res.end();
       return;
     }

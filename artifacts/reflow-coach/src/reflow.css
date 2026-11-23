@@ -125,6 +125,17 @@
 .reflow-week-button:focus-visible { outline: 2px solid #d89568; outline-offset: 2px; }
 .reflow-week-button:disabled { opacity: .5; cursor: not-allowed; }
 .plan-update-result { margin-top: 8px; color: #547157; font-size: 9px; }
+.reviewer-links { max-width: 560px; color: #536457; font-size: 12px; line-height: 1.6; }
+.reviewer-links a { color: #345942; text-decoration: underline; }
+.example-prompts { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 16px; }
+.example-prompts > span { width: 100%; color: #536457; font-size: 11px; }
+.example-prompts button { border: 1px solid #c4d1c6; border-radius: 16px; background: #f8faf4; color: #345942; padding: 6px 10px; font-size: 11px; cursor: pointer; }
+.example-prompts button:disabled { opacity: .5; cursor: default; }
+.proposal-comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 8px; background: #f4f3eb; border-radius: 6px; }
+.proposal-comparison > div { display: flex; flex-direction: column; gap: 4px; min-width: 0; overflow-wrap: anywhere; font-size: 11px; color: #344b3d; }
+.proposal-comparison strong { font-size: 10px; text-transform: uppercase; }
+.proposal-comparison small { font-size: 10px; line-height: 1.5; }
+.proposal-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .coach-prompt { margin: 0 0 14px; color: #53675b; font-size: 13px; line-height: 1.5; }
 .example-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
 .example-chip { display: inline-flex; align-items: center; gap: 3px; min-height: 29px; padding: 5px 8px; border: 1px solid #e3e4d9; border-radius: 7px; background: #f6f6ef; color: #718076; font-size: 9px; text-align: left; transition: border-color .16s, color .16s, background .16s; }

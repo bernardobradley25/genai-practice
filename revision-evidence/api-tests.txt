@@ -1,0 +1,52 @@
+TAP version 13
+# Subtest: API permits a valid explicit change
+ok 1 - API permits a valid explicit change
+  ---
+  duration_ms: 19.368167
+  type: 'test'
+  ...
+# Subtest: API blocks strength and soccer overlap before a card is sent
+ok 2 - API blocks strength and soccer overlap before a card is sent
+  ---
+  duration_ms: 4.285208
+  type: 'test'
+  ...
+# Subtest: API blocks an invalid time
+ok 3 - API blocks an invalid time
+  ---
+  duration_ms: 4.419375
+  type: 'test'
+  ...
+# Subtest: API blocks a zero duration
+ok 4 - API blocks a zero duration
+  ---
+  duration_ms: 2.842542
+  type: 'test'
+  ...
+# Subtest: API keeps exploration read only
+ok 5 - API keeps exploration read only
+  ---
+  duration_ms: 5.261167
+  type: 'test'
+  ...
+# Subtest: API rejects empty input
+ok 6 - API rejects empty input
+  ---
+  duration_ms: 3.812458
+  type: 'test'
+  ...
+# Subtest: API preserves the failure contract when AI is unavailable
+ok 7 - API preserves the failure contract when AI is unavailable
+  ---
+  duration_ms: 1384.579125
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1500.733292

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { applyPlanProposal, initialWeek } from './coaching-logic.ts';
+import { applyPlanProposal, initialWeek, validatePlanProposal, isSameWeek, parseStartTime, parseDuration } from './coaching-logic.ts';
 
 const discussedMove = {
   impact: 'The easy run replaces the steady run, so the week does not stack two runs on Thursday.',
@@ -75,9 +75,70 @@ test('counts Surf toward the five-day run/sport limit', () => {
     changes: [
       { sessionId: 'wed', sport: 'Surf', day: 'Wednesday', time: '7:15 PM', title: 'Surf', detail: '60 min', status: 'planned' },
       { sessionId: 'fri', sport: 'Surf', day: 'Friday', time: '5:30 PM', title: 'Surf', detail: '60 min', status: 'planned' },
-      { sessionId: 'sun', sport: 'Surf', day: 'Sunday', time: 'Open', title: 'Surf', detail: '60 min', status: 'planned' },
+      { sessionId: 'sun', sport: 'Surf', day: 'Sunday', time: '10:00 AM', title: 'Surf', detail: '60 min', status: 'planned' },
     ],
   };
 
   assert.equal(applyPlanProposal(initialWeek, overLimit), null);
+});
+
+const strengthMove = { sessionId: 'fri', sport: 'Strength', day: 'Wednesday', time: '7:15 PM', title: 'Strength + mobility', detail: '40 min · moderate', status: 'moved' };
+const proposalFor = (changes: object[]) => ({ impact: 'Review this change.', changes });
+
+test('blocks the reproduced soccer and strength overlap and explains it', () => {
+  const before = structuredClone(initialWeek);
+  const result = validatePlanProposal(initialWeek, proposalFor([strengthMove]));
+  assert.equal(result.ok, false);
+  if (!result.ok) assert.match(result.error, /Club training and Strength \+ mobility overlap on Wednesday/);
+  assert.deepEqual(initialWeek, before);
+});
+
+test('detects partial overlap even when start times differ', () => {
+  assert.equal(applyPlanProposal(initialWeek, proposalFor([{ ...strengthMove, time: '8:00 PM' }])), null);
+});
+
+test('allows back-to-back sessions at the exact end boundary', () => {
+  assert.ok(applyPlanProposal(initialWeek, proposalFor([{ ...strengthMove, time: '8:30 PM' }])));
+});
+
+for (const time of ['25:99 PM', '', 'Open', '13:00 PM', '6:60 PM']) {
+  test(`rejects invalid active start time ${JSON.stringify(time)}`, () => {
+    assert.equal(applyPlanProposal(initialWeek, proposalFor([{ ...strengthMove, day: 'Friday', time }])), null);
+  });
+}
+
+for (const detail of ['0 min', '-5 min', 'moderate', '75–60 min', '0–30 min']) {
+  test(`rejects invalid active duration ${JSON.stringify(detail)}`, () => {
+    assert.equal(applyPlanProposal(initialWeek, proposalFor([{ ...strengthMove, day: 'Friday', detail }])), null);
+  });
+}
+
+test('uses the upper duration bound when checking overlaps', () => {
+  const rangeWeek = initialWeek.map((session) => session.id === 'wed' ? { ...session, detail: '60–90 min · variable' } : session);
+  assert.equal(applyPlanProposal(rangeWeek, proposalFor([{ ...strengthMove, time: '8:30 PM' }])), null);
+});
+
+test('rejects sessions crossing midnight', () => {
+  assert.equal(applyPlanProposal(initialWeek, proposalFor([{ ...strengthMove, day: 'Friday', time: '11:45 PM' }])), null);
+});
+
+test('allows missed and rest entries without an active time or duration', () => {
+  assert.ok(applyPlanProposal(initialWeek, proposalFor([{ ...strengthMove, day: 'Friday', time: 'Open', detail: 'Rest', status: 'rest' }])));
+});
+
+test('rejects duplicate edits to the same session', () => {
+  assert.equal(applyPlanProposal(initialWeek, proposalFor([strengthMove, strengthMove])), null);
+});
+
+test('detects stale proposals even when the new week is independently valid', () => {
+  const changed = applyPlanProposal(initialWeek, discussedMove)!;
+  assert.equal(isSameWeek(structuredClone(initialWeek), initialWeek), true);
+  assert.equal(isSameWeek(initialWeek, changed), false);
+});
+
+test('parses noon, midnight, 24-hour times, and minute ranges', () => {
+  assert.equal(parseStartTime('12:00 AM'), 0);
+  assert.equal(parseStartTime('12:00 PM'), 720);
+  assert.equal(parseStartTime('18:30'), 1110);
+  assert.equal(parseDuration('60–75 min · variable'), 75);
 });
