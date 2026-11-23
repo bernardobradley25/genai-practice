@@ -34,8 +34,31 @@ export const initialWeek: Session[] = [
   { id: 'sun', day: 'Sunday', shortDay: 'SUN', sport: 'Run', title: 'Recovery buffer', detail: 'Unplanned space', time: 'Open', status: 'rest' },
 ];
 
-const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+export const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const editableStatuses = ['planned', 'moved', 'missed', 'rest'];
+
+export function summarizeWeek(sessions: Session[]) {
+  const active = sessions.filter((session) => !['missed', 'rest'].includes(session.status));
+  const sportDays = days.filter((day) => active.some((session) => session.day === day && session.sport !== 'Strength'));
+  return { sportDays, dayCount: sportDays.length,
+    runCount: active.filter((session) => session.sport === 'Run').length,
+    soccerCount: active.filter((session) => session.sport === 'Soccer').length,
+    surfCount: active.filter((session) => session.sport === 'Surf').length,
+    strengthCount: active.filter((session) => session.sport === 'Strength').length,
+  };
+}
+
+export function groupWeekByDay(sessions: Session[]) {
+  return days.map((day) => ({ day, sessions: sessions.filter((session) => session.day === day)
+    .sort((a, b) => (parseStartTime(a.time) ?? 1440) - (parseStartTime(b.time) ?? 1440)) }));
+}
+
+/** Compact proposal context fits alongside a reply within the API's message limit. */
+export function proposalHistory(proposal: PlanProposal, state: string): string {
+  return `Proposal status: ${state}. Changes: ${proposal.changes.map((change) =>
+    `${change.sessionId}: ${change.day} ${change.time}, ${change.sport}, ${change.title}, ${change.detail.slice(0, 90)}, ${change.status}`,
+  ).join('; ')}`;
+}
 
 export function isPlanProposal(value: unknown): value is PlanProposal {
   if (!value || typeof value !== 'object') return false;

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { applyPlanProposal, initialWeek, validatePlanProposal, isSameWeek, parseStartTime, parseDuration } from './coaching-logic.ts';
+import { applyPlanProposal, initialWeek, validatePlanProposal, isSameWeek, parseStartTime, parseDuration, summarizeWeek, groupWeekByDay, proposalHistory } from './coaching-logic.ts';
+import { ChatBudget } from '../../api-server/src/lib/chat-budget.ts';
 
 const discussedMove = {
   impact: 'The easy run replaces the steady run, so the week does not stack two runs on Thursday.',
@@ -141,4 +142,44 @@ test('parses noon, midnight, 24-hour times, and minute ranges', () => {
   assert.equal(parseStartTime('12:00 PM'), 720);
   assert.equal(parseStartTime('18:30'), 1110);
   assert.equal(parseDuration('60–75 min · variable'), 75);
+});
+
+test('calculates three actual sport days after a missed run without counting strength', () => {
+  const updated = applyPlanProposal(initialWeek, discussedMove)!;
+  assert.deepEqual(summarizeWeek(updated).sportDays, ['Wednesday', 'Thursday', 'Saturday']);
+  assert.equal(summarizeWeek(updated).dayCount, 3);
+  assert.equal(summarizeWeek(updated).strengthCount, 2);
+});
+
+test('groups a moved session on its new day while preserving every day and stable ID', () => {
+  const updated = applyPlanProposal(initialWeek, proposalFor([{ ...strengthMove, time: '8:30 PM' }]))!;
+  const groups = groupWeekByDay(updated);
+  assert.equal(groups.length, 7);
+  assert.deepEqual(groups[2].sessions.map((session) => session.id), ['wed', 'fri']);
+  assert.equal(groups[4].sessions.length, 0);
+  assert.deepEqual(groupWeekByDay([...updated].reverse()), groups);
+});
+
+test('proposal history includes the exact changes and dismissal state within the message budget', () => {
+  const text = proposalHistory(discussedMove, 'dismissed; not applied');
+  assert.match(text, /dismissed; not applied/);
+  assert.match(text, /thu: Thursday 6:30 PM/);
+  const longest = proposalHistory({ impact: 'x'.repeat(700), changes: initialWeek.map((session) => ({ sessionId: session.id, day: session.day, sport: session.sport, time: 'x'.repeat(40), title: 'x'.repeat(80), detail: 'x'.repeat(300), status: 'planned' })) }, 'applied earlier; current calendar is authoritative');
+  assert.ok(longest.length + 601 <= 3000);
+});
+
+test('demo capacity limits concurrency and releases exactly once', () => {
+  const budget = new ChatBudget(10, 1000, 1);
+  const first = budget.acquire(1000); assert.ok(first.ok);
+  assert.equal(budget.acquire(1001).ok, false);
+  first.release(); first.release();
+  const second = budget.acquire(1002); assert.ok(second.ok);
+  assert.equal(budget.acquire(1003).ok, false);
+});
+
+test('demo request budget does not refill on release and resets after its time window', () => {
+  const budget = new ChatBudget(1, 1000, 1);
+  const first = budget.acquire(1000); assert.ok(first.ok); first.release();
+  assert.deepEqual(budget.acquire(1001), { ok: false, retryAfter: 1 });
+  assert.equal(budget.acquire(2000).ok, true);
 });

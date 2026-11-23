@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
-import { ArrowUp, Check, LoaderCircle, Plus, RefreshCw, Sparkles } from 'lucide-react';
+import { ArrowUp, Check, LoaderCircle, Plus, RefreshCw, Sparkles, Square } from 'lucide-react';
 import {
   validatePlanProposal,
   isSameWeek,
   isPlanProposal,
+  summarizeWeek,
+  proposalHistory,
   type PlanProposal,
   type Session,
 } from '../coaching-logic';
@@ -75,6 +77,8 @@ function PlanUpdateCard({
   dismissed: boolean;
   onDismiss: () => void;
 }) {
+  const validation = validatePlanProposal(before, update);
+  const summary = validation.ok ? summarizeWeek(validation.week) : null;
   return (
     <div className={`plan-update${applied ? ' plan-update-applied' : ''}`} data-testid="reflow-plan-card">
       <div className="plan-update-heading">
@@ -90,10 +94,11 @@ function PlanUpdateCard({
           </div>
         })}
       </div>
+      {summary && <p className="plan-facts"><strong>{summary.dayCount} of 5 run + sport days</strong><span>{summary.sportDays.join(' · ') || 'No run or sport sessions'}</span><small>Calculated from the proposed calendar. Strength is tracked separately.</small></p>}
       <p className="plan-update-impact">{update.impact}</p>
       {error && <p className="plan-update-error" role="alert">{error}</p>}
       {applied ? (
-        <div className="plan-update-result" role="status">Week at a glance now reflects these changes.</div>
+        <div className="plan-update-result" role="status">Applied. See the calendar for your current week.</div>
       ) : dismissed ? <p className="plan-update-result">Dismissed. This proposal did not change the week.</p> : (
         <div className="proposal-actions">
         <button
@@ -120,6 +125,14 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
   const threadRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const nextId = useRef(0);
+  const requestRef = useRef<AbortController | null>(null);
+  const mounted = useRef(true);
+  const followReplies = useRef(true);
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => { mounted.current = false; requestRef.current?.abort(); };
+  }, []);
 
   useEffect(() => {
     setMessages([greeting]);
@@ -129,13 +142,18 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
   }, [conversationKey]);
 
   useEffect(() => {
-    threadRef.current?.scrollTo({ top: threadRef.current.scrollHeight, behavior: 'smooth' });
+    if (followReplies.current) threadRef.current?.scrollTo({ top: threadRef.current.scrollHeight, behavior: 'auto' });
   }, [messages, isThinking]);
 
   const sendMessage = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const content = draft.trim();
     if (!content || isThinking) return;
+    followReplies.current = true;
+    const controller = new AbortController();
+    requestRef.current = controller;
+    let timedOut = false;
+    const timeout = window.setTimeout(() => { timedOut = true; controller.abort(); }, 60000);
 
     const userMessage: ChatMessage = {
       id: `user-${nextId.current++}`,
@@ -151,17 +169,33 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
     ]);
     setIsThinking(true);
     setError('');
+    controller.signal.addEventListener('abort', () => {
+      window.clearTimeout(timeout);
+      if (!mounted.current) return;
+      setIsThinking(false);
+      setDraft(content);
+      setError(timedOut ? 'The coach took too long. Your draft is preserved and your week is unchanged. Try again.' : 'Reply stopped. Your draft is preserved and your week is unchanged.');
+      setMessages((current) => current.filter((item) => item.id !== userMessage.id && item.id !== assistantId));
+    }, { once: true });
 
     try {
       const conversation = [...messages, userMessage]
         .filter((item) => item.includeInHistory)
         .slice(-24)
-        .map(({ role, content: messageContent }) => ({ role, content: messageContent }));
+        .map((item) => {
+          if (!item.planUpdate) return { role: item.role, content: item.content.slice(0, 3000) };
+          const state = item.planUpdateApplied ? 'applied earlier; current calendar is authoritative'
+            : item.planUpdateDismissed ? 'dismissed by the athlete; not applied'
+            : item.planBaseWeek && !isSameWeek(item.planBaseWeek, week) ? 'outdated; not applied' : 'pending review; not applied';
+          return { role: item.role, content: `${item.content.slice(0, 600)}\n${proposalHistory(item.planUpdate, state)}`.slice(0, 3000) };
+        });
       const response = await fetch('/api/reflow/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: conversation, week }),
+        signal: controller.signal,
       });
+      if (controller.signal.aborted) return;
 
       if (!response.ok) {
         const body = await response.json().catch(() => null) as { error?: string } | null;
@@ -177,6 +211,7 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
       let pendingPlanUpdate: PlanProposal | null = null;
 
       const processBlock = (block: string) => {
+        if (controller.signal.aborted) return;
         const chatEvent = readEvent(block);
         if (!chatEvent) return;
         if (chatEvent.type === 'delta' && typeof chatEvent.content === 'string') {
@@ -202,6 +237,7 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
       }
       if (buffer.trim()) processBlock(buffer);
       await reader.cancel().catch(() => undefined);
+      if (controller.signal.aborted) return;
 
       if (streamError) throw new Error(streamError);
       if (!finished) throw new Error('The connection ended before the coach replied. Your week has not changed.');
@@ -221,6 +257,7 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
           : item,
       ));
     } catch (sendError) {
+      if (!mounted.current || controller.signal.aborted) return;
       const message = sendError instanceof Error ? sendError.message : 'Something went wrong. Your week has not changed.';
       setError(message === 'Failed to fetch'
         ? 'Couldn’t connect to the coach. Your message is still in the box, and your week hasn’t changed. Try again when the connection is back.'
@@ -228,8 +265,12 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
       setDraft(content);
       setMessages((current) => current.filter((item) => item.id !== userMessage.id && item.id !== assistantId));
     } finally {
-      setIsThinking(false);
-      textareaRef.current?.focus();
+      window.clearTimeout(timeout);
+      if (requestRef.current === controller) requestRef.current = null;
+      if (mounted.current && !controller.signal.aborted) {
+        setIsThinking(false);
+        textareaRef.current?.focus({ preventScroll: true });
+      }
     }
   };
 
@@ -268,7 +309,7 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
+    if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) {
       event.preventDefault();
       event.currentTarget.form?.requestSubmit();
     }
@@ -277,7 +318,7 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
   return (
     <div className="coach-chat">
       <div className="chat-toolbar">
-        <p>Talk through the change and its effect on the rest of your week.</p>
+        <p>Explore Jordan’s fictional week. Please leave out personal details.</p>
         <button
           type="button"
           className="new-chat-button"
@@ -298,7 +339,7 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
         ].map(([label, prompt]) => <button key={label} type="button" disabled={isThinking} onClick={() => { setDraft(prompt); textareaRef.current?.focus(); }}>{label}</button>)}
       </div>
 
-      <div className="chat-thread" ref={threadRef} aria-live="polite" aria-label="Coaching conversation" data-testid="chat-thread">
+      <div className="chat-thread" ref={threadRef} onScroll={() => { const el = threadRef.current; if (el) followReplies.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80; }} role="log" aria-live="polite" aria-busy={isThinking} aria-label="Coaching conversation" data-testid="chat-thread" tabIndex={0}>
         {messages.map((message) => (
           <article className={`chat-message ${message.role === 'user' ? 'chat-message-user' : 'chat-message-assistant'}`} key={message.id}>
             {message.role === 'assistant' ? (
@@ -306,7 +347,7 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
             ) : null}
             <div className="message-content">
               <span className="message-sender">{message.role === 'user' ? 'YOU' : 'REFLOW'}</span>
-              {message.content ? <p>{message.content}</p> : <span className="thinking-indicator"><LoaderCircle size={16} /> Thinking through your week…</span>}
+              {message.content ? <p>{message.content.split(/(\*\*[^*]+\*\*)/g).map((part, index) => part.startsWith('**') && part.endsWith('**') ? <strong key={index}>{part.slice(2, -2)}</strong> : part)}</p> : <span className="thinking-indicator"><LoaderCircle size={16} /> Thinking through your week…</span>}
               {message.planUpdate && (
                 <PlanUpdateCard
                   update={message.planUpdate}
@@ -343,9 +384,7 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
         />
         <div className="composer-bottom">
           <span>Enter to send · Shift + Enter for a new line</span>
-          <button type="submit" className="chat-send-button" disabled={!draft.trim() || isThinking} aria-label="Send message" data-testid="button-send-message">
-            {isThinking ? <LoaderCircle size={17} className="spin" /> : <ArrowUp size={17} />}
-          </button>
+          {isThinking ? <button key="stop" type="button" className="stop-reply" onClick={(event) => { event.preventDefault(); requestRef.current?.abort(); }}><Square size={14} /> Stop reply</button> : <button key="send" type="submit" className="chat-send-button" disabled={!draft.trim()} aria-label="Send message" data-testid="button-send-message"><ArrowUp size={17} /></button>}
         </div>
         {error && <p className="chat-error" role="alert" data-testid="chat-error">{error}</p>}
       </form>

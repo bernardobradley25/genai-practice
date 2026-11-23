@@ -4,15 +4,26 @@ Reflow is a prototype coaching experience for adult amateur athletes balancing r
 
 ## Prototype revision November 23 2026
 
-**Reviewer links:** [Live prototype](https://reflow-training-coach.replit.app) · [GitHub source](https://github.com/bernardobradley25/genai-practice) · [Revision branch](https://github.com/bernardobradley25/genai-practice/tree/fix/prototype-revision)
+**Reviewer links:** [Live prototype](https://reflow-training-coach.replit.app) · [GitHub source](https://github.com/bernardobradley25/genai-practice)
 
-**Release status:** Published and verified on November 23, 2026. [PR #1](https://github.com/bernardobradley25/genai-practice/pull/1) is merged into `main`; Replit deployed application commit `b5598d5`. The existing live URL serves the revision. Subsequent documentation commits record the live results.
+**Release status:** The initial revision in [PR #1](https://github.com/bernardobradley25/genai-practice/pull/1) was published and verified on November 23, 2026. The public-demo polish below has passed local checks and is prepared for deployment. Publication evidence is recorded separately after live verification.
 
 ### Feedback and response
 
 Three anonymous Canvas reviewers reported that they could not access the README, GitHub link, or prototype. The app URL was in MVP Attempt 1, GitHub in Attempt 2, and Attempt 3 contained only “The readme include the 3 cases.” The latest attempt lacked the links; this is consistent with the reviewers’ comments. No usability or coaching-quality conclusions can be drawn from those inaccessible reviews.
 
 The revision puts instructions and repository links inside the app, adds sample prompts, and prepares a single submission containing both links, the evaluation, and AI disclosure.
+
+### Public demo polish
+
+The release scope is a polished public demonstration using Jordan’s fictional sample week. It does not collect accounts or save personal training plans.
+
+- Reuses the approved smoke-test identity: official open-loop Reflow logo, white canvas, military olive actions, berry running/strength, and gold recreational sport. Fraunces headings and DM Sans text are served locally, with font licenses included.
+- Presents seven chronological days and groups moved sessions under their actual day. A strength session moved from Friday to Wednesday appears with Wednesday soccer, in time order, while Friday becomes empty.
+- Adds **Undo last change**, **Stop reply**, preserved drafts after failures, bounded waiting, and cancellation on reset. Stops do not accidentally resubmit the same message.
+- Calculates the proposal’s run/sport-day total and lists the days in application code; strength is tracked separately. The model receives stable session IDs, current calendar facts, and whether earlier proposals were applied, dismissed, or became outdated.
+- Improves mobile review cards, readable chat, keyboard skip navigation and focus, page zoom, and in-context fictional-data guidance. The footer stays in normal document flow.
+- Adds a per-process limit of 100 AI requests/hour and three concurrent calls, a 45-second upstream deadline, no automatic model retry, and input size checks. Stops release capacity. These are bounded-demo controls, not a durable account-wide spending cap: restarts and multiple instances reset/multiply the allowance.
 
 ### What changed
 
@@ -24,7 +35,7 @@ The revision puts instructions and repository links inside the app, adds sample 
 
 ### Revision test results
 
-Verification date: November 23, 2026. **24 logic tests and 7 API integration tests passed.** Project type checking, frontend build, and API build passed. Browser checks used the revised frontend and actual API with a deterministic local OpenAI-compatible fixture. They did not call a live model or use Replit credits. The original deployed app was tested with live AI before revision. Post-publication checks also exercised the revised live AI app; see [the live verification record](revision-evidence/live-checks.txt).
+Verification date: November 23, 2026. **29 logic tests and 11 API integration tests passed (40 total).** Project type checking, frontend build, and API build passed. Browser checks used the revised frontend and actual API with a deterministic local OpenAI-compatible fixture. They did not call a live model or use Replit credits. The original deployed app was tested with live AI before revision. Post-publication checks also exercised the revised live AI app; see [the live verification record](revision-evidence/live-checks.txt).
 
 | Test | Input or action | Observed result | Result |
 | --- | --- | --- | --- |
@@ -37,6 +48,8 @@ Verification date: November 23, 2026. **24 logic tests and 7 API integration tes
 | Incomplete soccer description | Ask whether unspecified soccer replaces Tuesday’s run | Original live coach asked about active minutes, effort, and stop-start play before recommending a change | Pass, original and revised live AI |
 | Empty input and service failure | Send empty API content; simulate unavailable AI | API returned 400 for empty input and 503 with unchanged-plan message for service failure; blank browser send was disabled | Pass, API/browser |
 | Existing protections | Attempt to alter completed work, exceed the cap, duplicate edits, or use unknown session IDs | Rejected; existing travel and valid schedule tests still passed | Pass, logic |
+
+The polish checks also verified chronological day grouping, exact proposal day totals, dismissed-proposal context, apply/undo on a 320px screen, immediate Stop recovery and retry, reset during an unfinished reply, and no horizontal overflow at 320px, 390px, and 1366px. Keyboard skip navigation focused the coach heading. The API concurrency test confirmed a fourth call receives 429 with Retry-After and cancellation restores capacity. See [the polish verification record](revision-evidence/polish-checks.txt). Earlier logs remain as historical evidence.
 
 Raw test logs and screenshots are in [revision-evidence](revision-evidence). Reproduce with:
 
@@ -56,18 +69,18 @@ node --experimental-strip-types --test scripts/revision-api.test.mjs
 
 1. Open the revised build. Choose “Missed run” and send the prompt.
 2. Discuss the plan, then agree to a specific change. Review the original/proposed comparison.
-3. Choose “Keep current week” to show that rejection preserves the plan. Request a fresh proposal and click “Reflow the week” to apply it.
+3. Choose “Keep current week” to show that rejection preserves the plan. Request a fresh proposal and click “Reflow the week” to apply it. Try “Undo last change” to restore the previous calendar.
 4. Reset the week. Try “Scheduling conflict.” The coach should request a feasible alternative; even if it produces an invalid tool call, the validator rejects it.
 
 ### AI use disclosure for this revision
 
-The product concept and intended coaching flow came from Bernardo Moreira’s prior work. For this revision, Bernardo asked Codex to investigate the feedback, fix the identified issues, and prepare the submission. Codex inspected Canvas attempts and anonymous comments, reviewed the repository, tested the original live app, implemented the shared validator and interface changes, authored and ran regression tests, checked the revised browser flow, and drafted the README, report, and disclosure. This was substantial AI assistance with implementation, testing, and writing; it was not limited to editing wording. After Bernardo authorized the Replit account, Codex merged and published the tested revision and performed live verification. The reported checks are AI-assisted verification, not independent human evaluation. Bernardo remains responsible for reviewing the package before submission.
+The product concept and intended coaching flow came from Bernardo Moreira’s prior work. For this revision, Bernardo asked Codex to investigate the feedback, fix the identified issues, and prepare the submission. Codex inspected Canvas attempts and anonymous comments, reviewed the repository, tested the original live app, implemented the shared validator and interface changes, authored and ran regression tests, checked the revised browser flow, and drafted the README, report, and disclosure. Codex also compared the broader Reflow project and smoke-test design, implemented the public-demo polish, and ran responsive, cancellation, and capacity checks. This was substantial AI assistance with implementation, testing, and writing; it was not limited to editing wording. After Bernardo authorized the Replit account, Codex merged and published the tested revision and performed live verification. The reported checks are AI-assisted verification, not independent human evaluation. Bernardo remains responsible for reviewing the package before submission.
 
 Representative requests were to find the feedback independently, fix Reflow’s scheduling issues, and prepare the revision with test results and AI disclosure. Testing used a fictional athlete. The original app uses Replit’s managed OpenAI integration for live conversation; the revised local integration tests used scripted model responses against the actual application code. These fixtures verify application behavior, not coaching accuracy or fitness outcomes.
 
 ### Remaining limitations
 
-This is one fictional week with no accounts or saved plans. Durations must start with minutes (for example, “35 min”); overnight sessions and multiple run/sport sessions on one day remain unsupported. User availability and training intensity are discussed by the AI but are not represented as fully enforceable scheduling constraints. There is no reviewed training-reference set, medical validation, or fresh independent user evaluation. Live checks revealed one generated explanation that said four activity days while listing three. The deterministic calendar correctly showed three; AI explanations can still contain arithmetic errors. The live scenario checks do not establish coaching accuracy.
+This is one fictional week with no accounts or saved plans. Durations must start with minutes (for example, “35 min”); overnight sessions and multiple run/sport sessions on one day remain unsupported. User availability and training intensity are discussed by the AI but are not represented as fully enforceable scheduling constraints. There is no reviewed training-reference set, medical validation, or fresh independent user evaluation. Live checks revealed one generated explanation that said four activity days while listing three. The deterministic calendar correctly showed three. The polish now displays a calculated day total and named days on every valid proposal and supplies those current facts to the model; generated prose can still contain arithmetic errors. The live scenario checks do not establish coaching accuracy.
 
 ## MVP: what it does
 

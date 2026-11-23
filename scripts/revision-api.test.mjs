@@ -33,3 +33,38 @@ test('API rejects empty input',async()=>{
 test('API preserves the failure contract when AI is unavailable',async()=>{
  const {response,text}=await request('Explain service failure.'); assert.equal(response.status,503); assert.match(text,/plan has not changed/);
 });
+
+test('API rejects whitespace-only messages before using AI',async()=>{
+ const {response}=await request('   '); assert.equal(response.status,400);
+});
+
+test('API rejects duplicate sessions in the supplied week',async()=>{
+ const response=await fetch('http://127.0.0.1:20368/api/reflow/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:'Move Friday.'}],week:[initialWeek[0],initialWeek[0]]})});
+ assert.equal(response.status,400);
+});
+
+test('API accepts a nonoverlapping strength move with its stable session ID',async()=>{
+ const {events}=await request('Move Friday strength after soccer on Wednesday.');
+ const proposal=events.find(e=>e.type==='reflow_ready'); assert.ok(proposal);
+ assert.equal(proposal.update.changes[0].sessionId,'fri');
+ assert.equal(proposal.update.changes[0].day,'Wednesday');
+});
+
+
+test('API caps concurrent calls and releases capacity when visitors stop',async()=>{
+ const controllers=Array.from({length:3},()=>new AbortController());
+ const pending=controllers.map(controller=>fetch('http://127.0.0.1:20368/api/reflow/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:'Explain a slow reply.'}],week:initialWeek}),signal:controller.signal}).catch(()=>null));
+ try {
+  await new Promise(resolve=>setTimeout(resolve,250));
+  const {response,text}=await request('Explain the week.');
+  assert.equal(response.status,429); assert.equal(response.headers.get('retry-after'),'15'); assert.match(text,/at capacity/);
+ } finally {
+  controllers.forEach(controller=>controller.abort()); await Promise.all(pending);
+ }
+ let recovered;
+ for(let attempt=0;attempt<20;attempt++) {
+  await new Promise(resolve=>setTimeout(resolve,50)); recovered=await request('Explain the week.');
+  if(recovered.response.status!==429) break;
+ }
+ assert.equal(recovered.response.status,200);
+});

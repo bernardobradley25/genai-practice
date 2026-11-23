@@ -1,9 +1,11 @@
 import { Router, type IRouter } from "express";
-import { validatePlanProposal } from "@workspace/reflow-plan";
+import { validatePlanProposal, summarizeWeek, days } from "@workspace/reflow-plan";
 import { ReflowChatBody } from "@workspace/api-zod";
 import { openai } from "@workspace/integrations-openai-ai-server";
+import { ChatBudget } from "../lib/chat-budget";
 
 const router: IRouter = Router();
+const chatBudget = new ChatBudget();
 
 const prepareReflowTool = {
   type: "function" as const,
@@ -106,19 +108,38 @@ router.post("/reflow/chat", async (req, res): Promise<void> => {
   }
 
   const { messages, week } = parsed.data;
+  if (messages.some((message) => !message.content.trim()) || messages.reduce((sum, message) => sum + message.content.length, 0) > 24000) {
+    res.status(400).json({ error: "Send a nonempty message. If this conversation is very long, start a new chat; your week stays in place." });
+    return;
+  }
+  if (new Set(week.map((session) => session.id)).size !== week.length || week.some((session) => !days.includes(session.day))) {
+    res.status(400).json({ error: "This week could not be read. Reset the demo and try again." });
+    return;
+  }
   if (messages.at(-1)?.role !== "user") {
     res.status(400).json({ error: "The latest message must be from you." });
     return;
   }
   const hasReflowIntent = hasClearReflowIntent(messages);
+  const capacity = chatBudget.acquire();
+  if (!capacity.ok) {
+    res.setHeader("Retry-After", String(capacity.retryAfter));
+    res.status(429).json({ error: "The public demo is at capacity. Please try again later. Your draft and week are unchanged." });
+    return;
+  }
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 45000);
+  const onClose = () => { if (!res.writableEnded) controller.abort(); };
+  res.on("close", onClose);
 
   const planContext = week.map((session) =>
-    `${session.day}: ${session.sport} — ${session.title}; ${session.detail}; ${session.time}; status: ${session.status}`,
+    `Session ID ${session.id} | ${session.day}: ${session.sport} — ${session.title}; ${session.detail}; ${session.time}; status: ${session.status}`,
   ).join("\n");
+  const facts = summarizeWeek(week);
   const chatMessages = [
     {
       role: "system" as const,
-      content: `${systemPrompt}\n\nCurrent plan:\n${planContext}`,
+      content: `${systemPrompt}\n\nCurrent calendar is authoritative, including after an undo. IDs identify sessions and do not change when the session moves to a new day. Use the explicit session ID in tool calls.\nCalculated current run/sport days: ${facts.dayCount} (${facts.sportDays.join(', ')}); strength is separate. Do not invent a numeric day count for a proposed plan; the proposal card calculates it.\n\nCurrent plan:\n${planContext}`,
     },
     ...messages.map(({ role, content }) => ({ role, content })),
   ];
@@ -126,7 +147,7 @@ router.post("/reflow/chat", async (req, res): Promise<void> => {
   try {
     const stream = await openai.chat.completions.create({
       model: "gpt-5.6-terra",
-      max_completion_tokens: 8192,
+      max_completion_tokens: 3072,
       reasoning_effort: "none",
       messages: chatMessages,
       ...(hasReflowIntent
@@ -137,7 +158,7 @@ router.post("/reflow/chat", async (req, res): Promise<void> => {
           }
         : {}),
       stream: true,
-    });
+    }, { signal: controller.signal, maxRetries: 0 });
 
     res.status(200);
     res.setHeader("Content-Type", "text/event-stream");
@@ -194,6 +215,7 @@ router.post("/reflow/chat", async (req, res): Promise<void> => {
     res.write(`data: ${JSON.stringify({ type: "done" })}\n\n`);
     res.end();
   } catch (error) {
+    if (res.destroyed) return;
     req.log.error({ err: error }, "Reflow chat request failed");
     if (res.headersSent) {
       res.write(`data: ${JSON.stringify({ type: "error", message: "I couldn’t reach the coaching service. Your plan has not changed. Please try again." })}\n\n`);
@@ -201,6 +223,10 @@ router.post("/reflow/chat", async (req, res): Promise<void> => {
       return;
     }
     res.status(503).json({ error: "The coaching service is unavailable right now. Your plan has not changed." });
+  } finally {
+    clearTimeout(timeout);
+    res.off("close", onClose);
+    capacity.release();
   }
 });
 
