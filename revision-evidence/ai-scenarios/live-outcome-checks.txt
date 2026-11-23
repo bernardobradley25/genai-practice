@@ -1,0 +1,13 @@
+PASS missed-run-agreement
+PASS soccer-substitution
+PASS travel-surf
+PASS natural-reschedule
+PASS half-session
+PASS hypothetical
+PASS unsupported-swimming
+PASS unsupported-cycling
+PASS completed-protection
+PASS injury-boundary
+PASS negated-agreement
+PASS impossible-time
+12 live scenario outcome checks passed. Prose quality is reviewed separately; this does not validate training advice.

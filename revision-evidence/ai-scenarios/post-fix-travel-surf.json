@@ -1,0 +1,143 @@
+{
+  "case": "travel-surf",
+  "runAt": "2026-11-23T23:48:47.623Z",
+  "initialWeek": [
+    {
+      "id": "mon",
+      "day": "Monday",
+      "shortDay": "MON",
+      "sport": "Strength",
+      "title": "Full-body strength",
+      "detail": "45 min · moderate",
+      "time": "6:30 PM",
+      "status": "done"
+    },
+    {
+      "id": "tue",
+      "day": "Tuesday",
+      "shortDay": "TUE",
+      "sport": "Run",
+      "title": "Easy run",
+      "detail": "35 min · conversational",
+      "time": "7:00 AM",
+      "status": "planned"
+    },
+    {
+      "id": "wed",
+      "day": "Wednesday",
+      "shortDay": "WED",
+      "sport": "Soccer",
+      "title": "Club training",
+      "detail": "75 min · variable",
+      "time": "7:15 PM",
+      "status": "planned"
+    },
+    {
+      "id": "thu",
+      "day": "Thursday",
+      "shortDay": "THU",
+      "sport": "Run",
+      "title": "Steady run",
+      "detail": "40 min · controlled",
+      "time": "6:45 AM",
+      "status": "planned"
+    },
+    {
+      "id": "fri",
+      "day": "Friday",
+      "shortDay": "FRI",
+      "sport": "Strength",
+      "title": "Strength + mobility",
+      "detail": "40 min · moderate",
+      "time": "5:30 PM",
+      "status": "planned"
+    },
+    {
+      "id": "sat",
+      "day": "Saturday",
+      "shortDay": "SAT",
+      "sport": "Run",
+      "title": "Long easy run",
+      "detail": "60 min · relaxed",
+      "time": "9:00 AM",
+      "status": "planned"
+    },
+    {
+      "id": "sun",
+      "day": "Sunday",
+      "shortDay": "SUN",
+      "sport": "Run",
+      "title": "Recovery buffer",
+      "detail": "Unplanned space",
+      "time": "Open",
+      "status": "rest"
+    }
+  ],
+  "results": [
+    {
+      "prompt": "I’m away Tuesday through Sunday. No running or soccer. I can surf Wednesday and Saturday at 9 AM for 60 minutes at easy effort, and do 30 minutes bodyweight strength Friday at 5:30 PM. Monday strength is already completed. What plan fits?",
+      "status": 200,
+      "elapsedMs": 2887,
+      "text": "For the travel week, I’d recommend:\n\n- **Mon:** keep completed full-body strength unchanged  \n- **Tue:** no run  \n- **Wed, 9:00 AM:** **Surf** — 60 min, easy (replaces soccer)  \n- **Thu:** no run  \n- **Fri, 5:30 PM:** **Strength** — 30 min bodyweight, easy-to-moderate (replaces the planned strength session)  \n- **Sat, 9:00 AM:** **Surf** — 60 min, easy (replaces the long run)  \n- **Sun:** rest / unplanned space  \n\nThis preserves your completed Monday session and keeps the travel activities in the planned workout slots without trying to cram in missed running. Surf can provide enjoyable aerobic movement, but it is not a direct substitute for the run-specific work; letting this be a lighter, lower-running week is the best recovery-friendly option.\n\nDo you like this plan?",
+      "errors": []
+    },
+    {
+      "prompt": "Yes, prepare that plan for review.",
+      "status": 200,
+      "elapsedMs": 2685,
+      "text": "",
+      "proposal": {
+        "impact": "Travel-week plan replaces Tuesday/Thursday/Saturday runs and Wednesday soccer with rest or easy surf, while Friday strength becomes a shorter bodyweight session. Monday’s completed strength remains unchanged; this is a lighter week with surf rather than run-specific training.",
+        "changes": [
+          {
+            "sport": "Run",
+            "day": "Tuesday",
+            "time": "7:00 AM",
+            "title": "Easy run — unavailable",
+            "detail": "No run while away.",
+            "status": "rest",
+            "sessionId": "tue"
+          },
+          {
+            "sport": "Surf",
+            "day": "Wednesday",
+            "time": "9:00 AM",
+            "title": "Easy surf",
+            "detail": "60 min · easy",
+            "status": "planned",
+            "sessionId": "wed"
+          },
+          {
+            "sport": "Run",
+            "day": "Thursday",
+            "time": "6:45 AM",
+            "title": "Steady run — unavailable",
+            "detail": "No run while away.",
+            "status": "rest",
+            "sessionId": "thu"
+          },
+          {
+            "sport": "Strength",
+            "day": "Friday",
+            "time": "5:30 PM",
+            "title": "Bodyweight strength",
+            "detail": "30 min · easy-to-moderate",
+            "status": "planned",
+            "sessionId": "fri"
+          },
+          {
+            "sport": "Surf",
+            "day": "Saturday",
+            "time": "9:00 AM",
+            "title": "Easy surf",
+            "detail": "60 min · easy",
+            "status": "planned",
+            "sessionId": "sat"
+          }
+        ]
+      },
+      "valid": true,
+      "errors": []
+    }
+  ]
+}

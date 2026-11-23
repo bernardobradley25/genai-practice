@@ -1,0 +1,40 @@
+Reflow live AI scenario evaluation — November 23, 2026
+Application release: 9677e920003beae3065434d77bc7e8c78cf27700
+Published URL: https://reflow-training-coach.replit.app/
+Fixes: GitHub PRs #3 and #4; merged and published through Replit.
+
+METHOD
+All activity details were fictional. The runner called the deployed SSE API with the initial sample week and multi-turn conversation history. Baseline: 10 scenarios / 15 turns. First retest: 11 scenarios / 16 turns. Final retest: 12 scenarios / 18 turns. Model proposals were validated against application calendar rules. The checker asserts expected outcomes; Codex also read the generated prose. Separate browser tests applied a real swim proposal and undid it.
+
+DEFECTS FOUND AND FIXED
+1. Ordinary approval and reschedule wording could claim a card without producing one. Clear-intent recognition now includes natural phrasing and abbreviated weekday context; refusal and uncertainty still suppress proposals.
+2. Travel changes duplicated session IDs. A keyed tool schema now permits one final change per session.
+3. Swimming was labeled Run. Swim is now supported across schema, validation, display, counts, and icon/color.
+4. Completed replacement soccer was omitted, undercounting actual activity. Explicitly reported replacement activity can now be recorded as done; existing completed originals remain protected.
+5. Coaching suggested a second run the calendar does not support. Instructions now enforce one run/sport session per day in discussion as well as proposals. Half of 35 minutes is explicitly rounded to 17–18 minutes.
+
+FINAL LIVE OUTCOMES — ALL 12 PASS
+Missed run: ordinary agreement produces a valid review card marking Tuesday missed; Thursday and Saturday retained.
+Soccer substitution: asks for effort/timing, then preserves Tuesday as completed Soccer, 90 elapsed / 60 active minutes; Thursday easy adjustment; Tuesday remains counted.
+Travel/surf: valid unique edits for Tuesday/Thursday rest, Wednesday/Saturday surf and Friday bodyweight strength; Monday completed strength unchanged.
+Natural reschedule: Saturday moves to 9:30 AM, still 60 minutes.
+Half session: Thursday replaces the steady run with 18 minutes easy at 6:30 PM; Tuesday missed.
+Hypothetical: discusses tradeoffs; no proposal.
+Swimming: Thursday is Swim, not Run; one swim counted.
+Unsupported cycling: explains Bike is not supported, offers feasible alternatives; no mislabeled card.
+Completed-work protection: the model attempted a change, but the validator rejected it with a specific message; no applicable card.
+Injury boundary: refuses the harder-run request; no proposal.
+Qualified/negated agreement: no proposal while the user is still deciding.
+Impossible overlap: refuses overlapping Wednesday strength and soccer; no proposal.
+
+BROWSER VERIFICATION
+Real AI swim proposal displayed original/proposed values and calculated four activity days. Clicking Reflow the week produced Thursday Easy swim at 6:30 PM for 30 minutes; totals were two runs and one swim. A follow-up coach answer matched those values. Undo restored Thursday 40-minute steady run at 6:45 AM, three runs and zero swims. Another coach answer correctly reflected the restored calendar. Screenshots and DOM conversation transcript are included.
+
+AUTOMATED VERIFICATION
+48 logic tests + 15 API integration tests = 63 passed. Full type checking, frontend production build and API build passed. Fixture tests use scripted model responses and do not establish model or coaching quality. Final live assertions: live-outcome-checks.txt.
+
+EVIDENCE
+baseline-*.json: original defects. iteration-1-*.json: first correction and the remaining abbreviated-weekday approval failure. post-fix-*.json: final deployed responses. Local fixture/build logs and browser screenshots are adjacent.
+
+LIMITS
+These are observed functional outcomes from finite AI-assisted tests, not an independent usability study or medical/fitness validation. Live responses vary. Existing demo scope remains one fictional week, no saved personal plans, no cycling or overnight sessions, and one run/sport session per day. The per-process request allowance is not a durable account-wide spending cap.

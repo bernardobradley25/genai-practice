@@ -1,0 +1,85 @@
+{
+  "case": "hypothetical",
+  "runAt": "2026-11-23T23:48:56.873Z",
+  "initialWeek": [
+    {
+      "id": "mon",
+      "day": "Monday",
+      "shortDay": "MON",
+      "sport": "Strength",
+      "title": "Full-body strength",
+      "detail": "45 min · moderate",
+      "time": "6:30 PM",
+      "status": "done"
+    },
+    {
+      "id": "tue",
+      "day": "Tuesday",
+      "shortDay": "TUE",
+      "sport": "Run",
+      "title": "Easy run",
+      "detail": "35 min · conversational",
+      "time": "7:00 AM",
+      "status": "planned"
+    },
+    {
+      "id": "wed",
+      "day": "Wednesday",
+      "shortDay": "WED",
+      "sport": "Soccer",
+      "title": "Club training",
+      "detail": "75 min · variable",
+      "time": "7:15 PM",
+      "status": "planned"
+    },
+    {
+      "id": "thu",
+      "day": "Thursday",
+      "shortDay": "THU",
+      "sport": "Run",
+      "title": "Steady run",
+      "detail": "40 min · controlled",
+      "time": "6:45 AM",
+      "status": "planned"
+    },
+    {
+      "id": "fri",
+      "day": "Friday",
+      "shortDay": "FRI",
+      "sport": "Strength",
+      "title": "Strength + mobility",
+      "detail": "40 min · moderate",
+      "time": "5:30 PM",
+      "status": "planned"
+    },
+    {
+      "id": "sat",
+      "day": "Saturday",
+      "shortDay": "SAT",
+      "sport": "Run",
+      "title": "Long easy run",
+      "detail": "60 min · relaxed",
+      "time": "9:00 AM",
+      "status": "planned"
+    },
+    {
+      "id": "sun",
+      "day": "Sunday",
+      "shortDay": "SUN",
+      "sport": "Run",
+      "title": "Recovery buffer",
+      "detail": "Unplanned space",
+      "time": "Open",
+      "status": "rest"
+    }
+  ],
+  "results": [
+    {
+      "prompt": "What if I moved Thursday’s run to Sunday? I am just comparing options; do not prepare changes yet.",
+      "status": 200,
+      "elapsedMs": 2991,
+      "text": "Moving Thursday’s 40-minute steady run to Sunday would give you more recovery after Wednesday soccer, but it places a controlled run the day after Saturday’s 60-minute long easy run.\n\n**Trade-off:**  \n- **Benefit:** less chance of carrying soccer fatigue into Thursday’s run.  \n- **Cost:** Sunday may compromise recovery from the long run, especially if Saturday runs longer or feels harder than expected.\n\nMy preference would be to keep Thursday if you feel reasonably fresh after soccer, and make it easier/shorter if needed rather than shifting the full steady session to Sunday. If Thursday is likely to be rough, Sunday could work best as a **shorter, easy-to-controlled** version—not a hard steady effort—after assessing how Saturday felt.\n\nDo you want to compare that with shortening Thursday instead?",
+      "errors": []
+    }
+  ]
+}

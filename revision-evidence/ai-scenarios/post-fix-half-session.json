@@ -1,0 +1,116 @@
+{
+  "case": "half-session",
+  "runAt": "2026-11-23T23:48:53.881Z",
+  "initialWeek": [
+    {
+      "id": "mon",
+      "day": "Monday",
+      "shortDay": "MON",
+      "sport": "Strength",
+      "title": "Full-body strength",
+      "detail": "45 min · moderate",
+      "time": "6:30 PM",
+      "status": "done"
+    },
+    {
+      "id": "tue",
+      "day": "Tuesday",
+      "shortDay": "TUE",
+      "sport": "Run",
+      "title": "Easy run",
+      "detail": "35 min · conversational",
+      "time": "7:00 AM",
+      "status": "planned"
+    },
+    {
+      "id": "wed",
+      "day": "Wednesday",
+      "shortDay": "WED",
+      "sport": "Soccer",
+      "title": "Club training",
+      "detail": "75 min · variable",
+      "time": "7:15 PM",
+      "status": "planned"
+    },
+    {
+      "id": "thu",
+      "day": "Thursday",
+      "shortDay": "THU",
+      "sport": "Run",
+      "title": "Steady run",
+      "detail": "40 min · controlled",
+      "time": "6:45 AM",
+      "status": "planned"
+    },
+    {
+      "id": "fri",
+      "day": "Friday",
+      "shortDay": "FRI",
+      "sport": "Strength",
+      "title": "Strength + mobility",
+      "detail": "40 min · moderate",
+      "time": "5:30 PM",
+      "status": "planned"
+    },
+    {
+      "id": "sat",
+      "day": "Saturday",
+      "shortDay": "SAT",
+      "sport": "Run",
+      "title": "Long easy run",
+      "detail": "60 min · relaxed",
+      "time": "9:00 AM",
+      "status": "planned"
+    },
+    {
+      "id": "sun",
+      "day": "Sunday",
+      "shortDay": "SUN",
+      "sport": "Run",
+      "title": "Recovery buffer",
+      "detail": "Unplanned space",
+      "time": "Open",
+      "status": "rest"
+    }
+  ],
+  "results": [
+    {
+      "prompt": "I missed Tuesday’s 35-minute easy run. I want half of that duration on Thursday at 6:30 PM, replacing Thursday’s steady run, not adding a second run. Keep Saturday unchanged. What exact duration and plan is that?",
+      "status": 200,
+      "elapsedMs": 2226,
+      "text": "**Plan:** replace Thursday’s 40-minute steady run with a **17–18 minute easy run** at **6:30 PM**—half of Tuesday’s missed 35 minutes, rounded practically.\n\n- **Tuesday:** missed easy run remains missed.\n- **Thursday:** 17–18 min easy, conversational effort, replacing the steady run (not an additional session).\n- **Saturday:** keep the 60-minute long easy run unchanged.\n\nThis keeps the make-up small and protects recovery before Saturday, though it does not replace the steady-run stimulus. Do you like this plan?",
+      "errors": []
+    },
+    {
+      "prompt": "Yes, prepare that half-session replacement for review.",
+      "status": 200,
+      "elapsedMs": 2266,
+      "text": "",
+      "proposal": {
+        "impact": "Tuesday’s missed easy run remains recorded as missed. Thursday becomes a short 18-minute conversational easy run at 6:30 PM instead of the steady run, preserving Saturday’s long easy run unchanged.",
+        "changes": [
+          {
+            "sport": "Run",
+            "day": "Tuesday",
+            "time": "7:00 AM",
+            "title": "Easy run",
+            "detail": "35 min · conversational",
+            "status": "missed",
+            "sessionId": "tue"
+          },
+          {
+            "sport": "Run",
+            "day": "Thursday",
+            "time": "6:30 PM",
+            "title": "Easy run — half-session replacement",
+            "detail": "18 min · conversational; replaces steady run as half of Tuesday's missed 35 min easy run",
+            "status": "planned",
+            "sessionId": "thu"
+          }
+        ]
+      },
+      "valid": true,
+      "errors": []
+    }
+  ]
+}
