@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
 import { ArrowUp, Check, LoaderCircle, Plus, RefreshCw, Sparkles } from 'lucide-react';
 import {
-  applyPlanProposal,
+  validatePlanProposal,
+  isSameWeek,
   isPlanProposal,
   type PlanProposal,
   type Session,
@@ -17,6 +18,8 @@ type ChatMessage = {
   planUpdate?: PlanProposal;
   planUpdateApplied?: boolean;
   planUpdateError?: string;
+  planBaseWeek?: Session[];
+  planUpdateDismissed?: boolean;
 };
 
 type ChatEvent =
@@ -59,33 +62,40 @@ function PlanUpdateCard({
   error,
   disabled,
   onReflow,
+  before,
+  dismissed,
+  onDismiss,
 }: {
   update: PlanProposal;
   applied: boolean;
   error?: string;
   disabled: boolean;
   onReflow: () => void;
+  before: Session[];
+  dismissed: boolean;
+  onDismiss: () => void;
 }) {
   return (
     <div className={`plan-update${applied ? ' plan-update-applied' : ''}`} data-testid="reflow-plan-card">
       <div className="plan-update-heading">
         {applied ? <Check size={14} /> : <RefreshCw size={13} />}
-        {applied ? 'WEEK REFLOWED' : 'READY TO REFLOW'}
+        {applied ? 'WEEK REFLOWED' : dismissed ? 'PROPOSAL DISMISSED' : error ? 'CHANGES NEEDED' : 'REVIEW CHANGES'}
       </div>
       <div className="proposal-changes">
-        {update.changes.map((change) => (
-          <div className="proposal-change" key={change.sessionId}>
-            <span className="proposal-day">{change.day.slice(0, 3).toUpperCase()}</span>
-            <span className="proposal-session">{change.title}<small>{change.detail}</small></span>
-            <span className="proposal-time">{change.time}</span>
+        {update.changes.map((change) => {
+          const original = before.find((session) => session.id === change.sessionId);
+          return <div className="proposal-comparison" key={change.sessionId}>
+            <div><strong>Original</strong><span>{original?.day} · {original?.time}</span><span>{original?.title}</span><small>{original?.detail} · {original?.status}</small></div>
+            <div><strong>Proposed</strong><span>{change.day} · {change.time}</span><span>{change.title}</span><small>{change.detail} · {change.status}</small></div>
           </div>
-        ))}
+        })}
       </div>
       <p className="plan-update-impact">{update.impact}</p>
       {error && <p className="plan-update-error" role="alert">{error}</p>}
       {applied ? (
         <div className="plan-update-result" role="status">Week at a glance now reflects these changes.</div>
-      ) : (
+      ) : dismissed ? <p className="plan-update-result">Dismissed. This proposal did not change the week.</p> : (
+        <div className="proposal-actions">
         <button
           type="button"
           className="reflow-week-button"
@@ -95,6 +105,8 @@ function PlanUpdateCard({
         >
           <RefreshCw size={13} /> Reflow the week
         </button>
+        <button type="button" className="new-chat-button" onClick={onDismiss} disabled={disabled}>Keep current week</button>
+        </div>
       )}
     </div>
   );
@@ -203,6 +215,7 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
                 ? 'This plan is ready when you are. Click “Reflow the week” to make these changes.'
                 : 'I wasn’t able to put together a useful reply just now. Your plan hasn’t changed.'),
               planUpdate: pendingPlanUpdate ?? undefined,
+              planBaseWeek: pendingPlanUpdate ? week.map((session) => ({ ...session })) : undefined,
               includeInHistory: true,
             }
           : item,
@@ -220,18 +233,28 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
     }
   };
 
+  const proposalError = (message: ChatMessage): string | undefined => {
+    if (!message.planUpdate || message.planUpdateApplied || message.planUpdateDismissed) return undefined;
+    if (!message.planBaseWeek || !isSameWeek(message.planBaseWeek, week)) return 'Your week has changed since this proposal. Ask for a new proposal before applying it.';
+    const result = validatePlanProposal(week, message.planUpdate);
+    return result.ok ? undefined : result.error;
+  };
+
   const reflowWeek = (messageId: string, update: PlanProposal) => {
-    const revisedWeek = applyPlanProposal(week, update);
-    if (!revisedWeek) {
+    const message = messages.find((item) => item.id === messageId);
+    if (!message || message.planUpdateApplied || message.planUpdateDismissed) return;
+    const validation = validatePlanProposal(week, update);
+    const problem = proposalError(message);
+    if (!validation.ok || problem) {
       setMessages((current) => current.map((item) =>
         item.id === messageId
-          ? { ...item, planUpdateError: 'This Reflow no longer fits the current week. Your week is unchanged.' }
+          ? { ...item, planUpdateError: `${problem ?? (!validation.ok ? validation.error : '')} Your week is unchanged.` }
           : item,
       ));
       return;
     }
 
-    setWeek(revisedWeek);
+    setWeek(validation.week);
     setMessages((current) => current.map((item) =>
       item.id === messageId
         ? {
@@ -266,6 +289,15 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
         </button>
       </div>
 
+      <div className="example-prompts" aria-label="Try a sample scenario">
+        <span>Try a sample scenario</span>
+        {[
+          ['Missed run', 'I missed Tuesday’s 35-minute easy run. I have 35 minutes free Thursday evening. What should I change?'],
+          ['Soccer instead', 'I skipped Tuesday’s run and played soccer instead. Does that replace the run?'],
+          ['Scheduling conflict', 'Move Friday’s strength to Wednesday at 7:15 PM and keep Wednesday soccer at 7:15 PM too. Prepare that exact plan.'],
+        ].map(([label, prompt]) => <button key={label} type="button" disabled={isThinking} onClick={() => { setDraft(prompt); textareaRef.current?.focus(); }}>{label}</button>)}
+      </div>
+
       <div className="chat-thread" ref={threadRef} aria-live="polite" aria-label="Coaching conversation" data-testid="chat-thread">
         {messages.map((message) => (
           <article className={`chat-message ${message.role === 'user' ? 'chat-message-user' : 'chat-message-assistant'}`} key={message.id}>
@@ -279,7 +311,10 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
                 <PlanUpdateCard
                   update={message.planUpdate}
                   applied={Boolean(message.planUpdateApplied)}
-                  error={message.planUpdateError}
+                  error={message.planUpdateError ?? proposalError(message)}
+                  before={message.planBaseWeek ?? []}
+                  dismissed={Boolean(message.planUpdateDismissed)}
+                  onDismiss={() => setMessages((current) => current.map((item) => item.id === message.id ? { ...item, planUpdateDismissed: true } : item))}
                   disabled={isThinking}
                   onReflow={() => reflowWeek(message.id, message.planUpdate!)}
                 />
