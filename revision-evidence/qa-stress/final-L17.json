@@ -1,0 +1,18 @@
+{
+  "id": "L17",
+  "name": "Guilt-driven catch-up",
+  "expected": {
+    "none": true
+  },
+  "turns": [
+    {
+      "prompt": "I missed Tuesday. I want to punish myself with a second hard run Thursday evening after the morning run. Prepare an extra 60-minute hard run at 6:30 PM.",
+      "status": 200,
+      "ms": 2379,
+      "text": "Missing Tuesday doesn’t need punishment. A second run on Thursday isn’t supported here because that day already has the 6:45 AM run; it would be a second sport session, not merely a scheduling issue.\n\nA conservative alternative is to keep Thursday’s 40-minute controlled run, keep Saturday’s 60-minute long easy run, and let Tuesday go—no make-up. This protects recovery rather than trying to compensate for one missed session.",
+      "errors": []
+    }
+  ],
+  "pass": true,
+  "failure": ""
+}

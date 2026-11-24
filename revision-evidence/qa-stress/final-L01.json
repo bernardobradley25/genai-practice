@@ -1,0 +1,33 @@
+{
+  "id": "L01",
+  "name": "Calendar workaround: context before edit",
+  "expected": {
+    "id": "sat",
+    "time": "10:00 AM"
+  },
+  "turns": [
+    {
+      "prompt": "My work calendar changed. Move Saturday’s run to 10:00 AM Saturday, keeping 60 minutes and all other sessions.",
+      "status": 200,
+      "ms": 2157,
+      "text": "",
+      "proposal": {
+        "impact": "Keeps the long easy run at 60 minutes, one hour later on Saturday; all other sessions remain unchanged.",
+        "changes": [
+          {
+            "sport": "Run",
+            "day": "Saturday",
+            "time": "10:00 AM",
+            "title": "Long easy run",
+            "detail": "60 min · relaxed",
+            "status": "moved",
+            "sessionId": "sat"
+          }
+        ]
+      },
+      "errors": []
+    }
+  ],
+  "pass": true,
+  "failure": ""
+}

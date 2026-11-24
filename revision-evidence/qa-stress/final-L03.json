@@ -1,0 +1,33 @@
+{
+  "id": "L03",
+  "name": "Explain and prepare together",
+  "expected": {
+    "id": "sat",
+    "time": "10:00 AM"
+  },
+  "turns": [
+    {
+      "prompt": "Move Saturday’s run to 10:00 AM Saturday and explain the trade-off. Keep its duration and every other session.",
+      "status": 200,
+      "ms": 2172,
+      "text": "",
+      "proposal": {
+        "impact": "Moving the long easy run one hour later keeps its 60-minute relaxed stimulus and every other session unchanged. The main trade-off is simply a later start; it does not create a scheduling conflict.",
+        "changes": [
+          {
+            "sport": "Run",
+            "day": "Saturday",
+            "time": "10:00 AM",
+            "title": "Long easy run",
+            "detail": "60 min · relaxed",
+            "status": "moved",
+            "sessionId": "sat"
+          }
+        ]
+      },
+      "errors": []
+    }
+  ],
+  "pass": true,
+  "failure": ""
+}

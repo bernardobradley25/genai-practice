@@ -1,0 +1,154 @@
+- link "Skip to the coach":
+  - /url: "#coach-heading"
+- banner:
+  - link "Reflow home":
+    - /url: /
+    - img "Reflow"
+  - generic: TRAINING DESK
+  - generic: A WEEK THAT FITS
+  - button "Reset week":
+    - generic: Reset week
+- main:
+  - generic: YOUR TRAINING, IN CONTEXT
+  - heading "Make room for real life." [level=1]:
+    - text: Make room for
+    - text: real life.
+  - paragraph: A practical plan for the whole week—not a pile of sessions competing for space.
+  - paragraph:
+    - text: Try a sample below, discuss a change, then review the original and proposed sessions before applying it.
+    - link "Instructions and test results":
+      - /url: https://github.com/bernardobradley25/genai-practice#readme
+    - text: ·
+    - link "GitHub source":
+      - /url: https://github.com/bernardobradley25/genai-practice
+  - navigation "Workspace sections":
+    - link "Talk to the coach ↓":
+      - /url: "#coach-heading"
+    - link "View your week":
+      - /url: "#week-heading"
+  - generic: JM
+  - strong: Jordan M.
+  - generic: Fictional athlete · interactive demo
+  - generic: SAMPLE WEEK
+  - region "This week, at a glance":
+    - text: THE WHOLE ROUTINE
+    - heading "This week, at a glance" [level=2]
+    - generic: 4 / 5
+    - generic: run + sport days
+    - generic: GOAL
+    - text: 10K · comfortable finish
+    - generic: OPEN
+    - text: Thu evening
+    - generic: CAP
+    - text: 5 run / sport days
+    - article "Monday":
+      - generic: MON
+      - heading "Full-body strength" [level=3]
+      - text: Completed
+      - paragraph: 45 min · moderate
+      - text: 6:30 PM
+    - article "Tuesday":
+      - generic: TUE
+      - heading "Easy run" [level=3]
+      - paragraph: 35 min · conversational
+      - text: 7:00 AM
+    - article "Wednesday":
+      - generic: WED
+      - heading "Club training" [level=3]
+      - paragraph: 75 min · variable
+      - text: 7:15 PM
+    - article "Thursday":
+      - generic: THU
+      - heading "Steady run" [level=3]
+      - paragraph: 40 min · controlled
+      - text: 6:45 AM
+    - article "Friday":
+      - generic: FRI
+      - heading "Strength + mobility" [level=3]
+      - paragraph: 40 min · moderate
+      - text: 5:30 PM
+    - article "Saturday":
+      - generic: SAT
+      - heading "Long easy run" [level=3]
+      - paragraph: 60 min · relaxed
+      - text: 7:00 PM
+      - generic: MOVED
+    - article "Sunday":
+      - generic: SUN
+      - generic: open
+      - paragraph: Recovery buffer
+    - button "Undo last change":
+      - text: Undo last change
+    - generic: Run
+    - generic: Soccer
+    - generic: Surf
+    - generic: Swim
+    - generic: Strength
+    - generic: 3 runs · 1 soccer · 0 surf · 0 swim · 2 strength
+  - region "Let’s work through it.":
+    - text: REFLOW COACH
+    - text: LIVE AI
+    - heading "Let’s work through it." [level=2]
+    - paragraph: Explore Jordan’s fictional week. Please leave out personal details.
+    - button "New chat":
+      - text: New chat
+    - generic "Try a sample scenario":
+      - generic: Try a sample scenario
+      - button "Missed run"
+      - button "Soccer instead"
+      - button "Scheduling conflict"
+    - log "Coaching conversation":
+      - article:
+        - generic: REFLOW
+        - paragraph: I’m here to think through your training week with you. What changed, what are you hoping to keep, and what feels uncertain? We can work through the impact before changing anything.
+      - article:
+        - generic: YOU
+        - paragraph: Move Saturday’s run to 7. Keep its duration. Prepare it.
+      - article:
+        - generic: REFLOW
+        - paragraph: Do you mean AM or PM for that start time? I will leave the calendar unchanged until the time is clear.
+      - article:
+        - generic: YOU
+        - paragraph: 7 PM please, same Saturday and same 60 minutes.
+      - article:
+        - generic: REFLOW
+        - paragraph: This plan is ready when you are. Click “Reflow the week” to make these changes. Reflowed—the updated week is shown in Week at a glance.
+        - text: WEEK REFLOWED
+        - strong: Original
+        - generic: Saturday · 9:00 AM
+        - generic: Long easy run
+        - generic: 60 min · relaxed · planned
+        - strong: Proposed
+        - generic: Saturday · 7:00 PM
+        - generic: Long easy run
+        - generic: 60 min · relaxed · moved
+        - paragraph:
+          - strong: 4 of 5 run + sport days
+          - generic: Tuesday · Wednesday · Thursday · Saturday
+          - generic: Calculated from the proposed calendar. Strength is tracked separately.
+        - paragraph: Moves the long easy run later on Saturday while keeping its 60-minute relaxed duration. Note that it ends at 8:00 PM; no other activity is scheduled then.
+        - status: Applied. See the calendar for your current week.
+    - generic: Message Reflow
+    - textbox "Message Reflow":
+      - /placeholder: Tell me what happened, what you’re worried about, or what you’re weighing up…
+    - generic: Enter to send · Shift + Enter for a new line
+    - button "Send message" [disabled]:
+    - generic: AI conversation
+    - generic: Changes reset when you refresh
+  - region "Coaching principles":
+    - generic: "01"
+    - strong: Whole-week thinking
+    - generic: Every sport shares the same recovery budget.
+    - generic: "02"
+    - strong: No false equivalents
+    - generic: Soccer is not a run with a different label.
+    - generic: "03"
+    - strong: You stay in charge
+    - generic: Review any proposed change before it lands.
+- contentinfo:
+  - paragraph:
+    - strong: Prototype note
+    - text: AI responses can be wrong and are not medical advice. Messages go to Replit’s managed AI service; this prototype does not save conversation history. Use the fictional profile—don’t enter identifying or medical details.
+  - generic: FICTIONAL ATHLETE · NO APP STORAGE
+- region "Notifications (F8)":
+  - list

@@ -1,18 +1,18 @@
-✔ API permits a valid explicit change (21.114ms)
-✔ API blocks strength and soccer overlap before a card is sent (2.68525ms)
-✔ API blocks an invalid time (2.124834ms)
-✔ API blocks a zero duration (2.535ms)
-✔ API keeps exploration read only (1.739625ms)
-✔ API rejects empty input (1.47175ms)
-✔ API preserves the failure contract when AI is unavailable (2.899833ms)
-✔ API rejects whitespace-only messages before using AI (1.427042ms)
-✔ API rejects duplicate sessions in the supplied week (1.064ms)
-✔ API accepts a nonoverlapping strength move with its stable session ID (2.131125ms)
-✔ API caps concurrent calls and releases capacity when visitors stop (322.241208ms)
-✔ API offers the review tool for natural reschedule wording (5.737416ms)
-✔ API accepts ordinary agreement to a specific recommendation (4.80825ms)
-✔ API preserves Swim and accepts the updated calendar in follow-up chat (5.754666ms)
-✔ API can stage an explicitly reported completed replacement activity (2.371792ms)
+✔ API permits a valid explicit change (21.85475ms)
+✔ API blocks strength and soccer overlap before a card is sent (2.946583ms)
+✔ API blocks an invalid time (2.368375ms)
+✔ API blocks a zero duration (2.383417ms)
+✔ API keeps exploration read only (1.826292ms)
+✔ API rejects empty input (1.626584ms)
+✔ API preserves the failure contract when AI is unavailable (2.853334ms)
+✔ API rejects whitespace-only messages before using AI (2.778ms)
+✔ API rejects duplicate sessions in the supplied week (2.256916ms)
+✔ API accepts a nonoverlapping strength move with its stable session ID (2.796042ms)
+✔ API caps concurrent calls and releases capacity when visitors stop (319.357042ms)
+✔ API offers the review tool for natural reschedule wording (3.5265ms)
+✔ API accepts ordinary agreement to a specific recommendation (3.041208ms)
+✔ API preserves Swim and accepts the updated calendar in follow-up chat (5.636291ms)
+✔ API can stage an explicitly reported completed replacement activity (2.363333ms)
 ℹ tests 15
 ℹ suites 0
 ℹ pass 15
@@ -20,4 +20,4 @@
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 453.9275
+ℹ duration_ms 455.238042

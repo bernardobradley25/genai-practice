@@ -1,0 +1,33 @@
+{
+  "id": "L08",
+  "name": "24-hour phone-calendar input",
+  "expected": {
+    "id": "thu",
+    "time": "18:30"
+  },
+  "turns": [
+    {
+      "prompt": "Move Thursday’s run to 18:30 Thursday, still 40 minutes. Keep other sessions unchanged.",
+      "status": 200,
+      "ms": 1812,
+      "text": "",
+      "proposal": {
+        "impact": "Thursday’s steady run moves later the same day, with its 40-minute duration unchanged. All other sessions stay as they are.",
+        "changes": [
+          {
+            "sport": "Run",
+            "day": "Thursday",
+            "time": "6:30 PM",
+            "title": "Steady run",
+            "detail": "40 min · controlled",
+            "status": "moved",
+            "sessionId": "thu"
+          }
+        ]
+      },
+      "errors": []
+    }
+  ],
+  "pass": true,
+  "failure": ""
+}

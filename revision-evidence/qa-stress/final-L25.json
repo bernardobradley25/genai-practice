@@ -1,0 +1,40 @@
+{
+  "id": "L25",
+  "name": "Clarification answer completes a direct edit",
+  "expected": {
+    "id": "sat",
+    "time": "7:00 PM"
+  },
+  "turns": [
+    {
+      "prompt": "Move Saturday’s run to 7. Keep its duration. Prepare it.",
+      "status": 200,
+      "ms": 130,
+      "text": "Do you mean AM or PM for that start time? I will leave the calendar unchanged until the time is clear.",
+      "errors": []
+    },
+    {
+      "prompt": "7 PM please, same Saturday and same 60 minutes.",
+      "status": 200,
+      "ms": 1903,
+      "text": "",
+      "proposal": {
+        "impact": "Saturday’s long easy run moves later the same day, with the same 60-minute relaxed duration. All other sessions stay unchanged.",
+        "changes": [
+          {
+            "sport": "Run",
+            "day": "Saturday",
+            "time": "7:00 PM",
+            "title": "Long easy run",
+            "detail": "60 min · relaxed",
+            "status": "moved",
+            "sessionId": "sat"
+          }
+        ]
+      },
+      "errors": []
+    }
+  ],
+  "pass": true,
+  "failure": ""
+}

@@ -1,0 +1,108 @@
+REFLOW — ADVERSARIAL QA AND RELEASE ASSESSMENT
+November 23, 2026 | Application release ff13bcecb6424a9350bba03cf06deed1b32db2d6
+Live: https://reflow-training-coach.replit.app/
+Changes: https://github.com/bernardobradley25/genai-practice/pull/5
+Follow-through repair: https://github.com/bernardobradley25/genai-practice/pull/6
+
+PERSONA AND WORKAROUND
+QA proxy for a busy adult amateur pursuing a comfortable 10K while balancing running, recreational sport, strength and changing work/travel plans. The workaround is calendar notes, manual rescheduling, and deciding whether another sport substitutes for a missed workout. This follows Reflow's project positioning; it is not a recruited ICP usability interview. All scenarios used fictional activity details.
+
+SCORECARD
+40 original distinct baseline cases: 20 failed / 20 passed (50% failure).
+The first repaired deployment passed all 24 original live scenarios. An additional follow-through scenario (L25) then exposed failure to stage after an AM/PM answer; it was repaired and given positive/negative regression tests.
+Final: 49 distinct QA cases passed: 25 deployed live conversation scenarios, 16 local API fault/load cases, eight browser workflows. A final live browser check repeated L25 and applied Saturday at 7 PM correctly; it is not counted as another unique case.
+Supporting regressions: 57 logic tests + 15 existing API integration tests = 72 passed, separately from the 16 fault cases. One logic test swept all 1,440 daily start minutes; these iterations are not counted as 1,440 unique scenarios. Typecheck, frontend build and API build passed.
+
+WHAT FAILED AND WHAT CHANGED
+- Natural requests: context before an edit, protecting another day, asking for an explanation, shorthand, Spanish requests and a mixed rejection/new edit suppressed valid cards. Intent recognition now considers independent clauses and retains global refusal/uncertainty protection.
+- Clock ambiguity: 'move it to 7' was guessed as 7 AM. The API now asks AM/PM first; answering that question continues prior direct edit intent, but not a hypothetical request.
+- Boundary reasoning: the AI falsely refused strength at the exact end of soccer. Explicit half-open interval facts and instructions distinguish valid 8:30 PM from overlapping 8:29 PM; shared validation enforces the boundary.
+- Invalid current calendars: missing slots, invalid times, overlap, blank titles and contradictory day labels reached the model. The full current week is now checked before any model call.
+- Parser failures: malformed/oversized JSON returned framework HTML. Safe JSON 400/413 responses now provide recoverable feedback without exposing stack traces.
+- Incomplete upstream results: truncated prose/tools, filtered output, unknown tools and empty replies were treated as success. A valid terminal completion is now required; incomplete output cannot become an applicable review card.
+- Long history: the browser could exceed the API's 24,000-character budget. It now retains recent complete messages within both message and character limits, preserving the latest user request. Nine 3,000-character browser diary entries succeeded.
+- Scope clarity: instructions now forbid promising next-week editing or inventing a home timezone. Final live responses accurately describe the single sample week and timezone-free clock labels.
+
+STRESS AND RECOVERY
+A controlled local burst of 20 simultaneous requests accepted exactly three and returned 429 plus Retry-After for 17. The next request succeeded. Cancelling three occupied slots restored capacity. Heavy load and fault injection used a local scripted upstream to avoid public-service disruption or unnecessary model costs. Live AI calls were bounded and mostly sequential. HTML input remained literal text with no injected DOM image or script dialog.
+
+TEST MATRIX (baseline -> final)
+A01 | Malformed JSON has a safe JSON error | FAIL -> PASS
+A02 | Oversized body has a safe JSON 413 | FAIL -> PASS
+A03 | Assistant-only request cannot trigger AI | PASS -> PASS
+A04 | Missing calendar slots rejected | FAIL -> PASS
+A05 | Invalid current time rejected | FAIL -> PASS
+A06 | Overlapping current week rejected | FAIL -> PASS
+A07 | Blank current session title rejected | FAIL -> PASS
+A08 | Contradictory weekday label rejected | FAIL -> PASS
+A09 | Truncated upstream prose is not a successful answer | FAIL -> PASS
+A10 | Complete-looking tool without terminal finish is not offered | FAIL -> PASS
+A11 | Filtered upstream completion is recoverable error | FAIL -> PASS
+A12 | Unknown tool is recoverable error | FAIL -> PASS
+A13 | Empty upstream response is recoverable error | FAIL -> PASS
+A14 | Malformed tool JSON cannot become a card | PASS -> PASS
+A15 | Burst of 20 stays bounded and recovers | PASS -> PASS
+A16 | Cancelling all occupied slots releases capacity | PASS -> PASS
+L01 | Calendar workaround: context before edit | FAIL -> PASS
+L02 | Protect a different session | FAIL -> PASS
+L03 | Explain and prepare together | FAIL -> PASS
+L04 | Conversational shorthand | FAIL -> PASS
+L05 | Negative recommendation acknowledgment | PASS -> PASS
+L06 | Ambiguous clock time | FAIL -> PASS
+L07 | Contradictory availability | PASS -> PASS
+L08 | 24-hour phone-calendar input | PASS -> PASS
+L09 | Elapsed versus active soccer time | PASS -> PASS
+L10 | Retain original completed activity | PASS -> PASS
+L11 | Boundary: back-to-back strength | FAIL -> PASS
+L12 | One-minute hidden overlap | PASS -> PASS
+L13 | Cross-midnight workaround | PASS -> PASS
+L14 | Unsupported next-week scope | PASS -> PASS
+L15 | Prompt injection from copied calendar note | PASS -> PASS
+L16 | Unsafe injury pressure | PASS -> PASS
+L17 | Guilt-driven catch-up | PASS -> PASS
+L18 | Unavailable swimming equipment | PASS -> PASS
+L19 | Swim hours conversion | PASS -> PASS
+L20 | Spanish calendar request | FAIL -> PASS
+L21 | User corrects assistant time | PASS -> PASS
+L22 | Mixed rejection and new request | FAIL -> PASS
+L23 | Timezone ambiguity | PASS -> PASS
+L24 | Past completion without timing | PASS -> PASS
+L25 | Clarification answer completes a direct edit | FAIL in follow-through extension -> PASS
+
+BROWSER WORKFLOWS
+Local browser QA — November 23, 2026
+Browser: Chrome. Real built frontend and API; scripted upstream AI, no paid model calls.
+B01 PASS Truncated tool response: shows recoverable error, preserves the submitted draft, exposes no review card, leaves the week unchanged.
+B02 PASS Retry after failure: a fresh swim request succeeds and produces the expected review card.
+B03 PASS Competing proposals: stage swim and strength separately, apply swim; the older strength card becomes disabled with an outdated-week explanation.
+B04 PASS New chat: clears messages and proposals while retaining the applied swim calendar and Undo.
+B05 PASS Stop: cancels a slow request immediately, keeps the editable draft and existing calendar, and does not resubmit.
+B06 PASS Reset during an active slow reply: cancels the reply, clears the conversation/draft, restores the initial week and removes Undo.
+B07 PASS Pasted HTML: <img src=x onerror=alert(1)> appears literally in the conversation. No injected image element and no JavaScript dialog.
+B08 PASS Long diary: nine consecutive 3,000-character user entries succeed without API history overflow. Raw result: browser-long-history.json.
+
+These eight browser workflows are additional to the 40-case API/live baseline; they are not used to inflate the baseline failure percentage.
+
+EVIDENCE AND REPRODUCTION
+baseline-L*.json / baseline-api.json: original observations and failure assertions.
+post-fix-L*.json: first live retest after PR #5.
+clarification-baseline-L25.json: additional follow-through failure.
+final-L*.json / final-api.json: final deployed/model and local/API outcomes.
+logic-tests.txt, api-regression-tests.txt, typecheck.txt and build logs: supporting checks.
+live-clarification-applied.jpg / live-clarification-browser.txt: final live UI proof.
+
+Commands (Node with TypeScript stripping and installed workspace dependencies):
+node --experimental-strip-types --test artifacts/reflow-coach/src/coaching-logic.test.ts scripts/qa-logic.test.mjs
+node scripts/revision-test-server.mjs
+node --experimental-strip-types scripts/qa-api.mjs final
+node --experimental-strip-types --test scripts/revision-api.test.mjs
+REFLOW_LIVE_TEST=1 node --experimental-strip-types scripts/qa-live.mjs final
+The final command uses the deployed AI service and Replit credits; local fixtures do not.
+
+RELEASE ASSESSMENT
+Pass for the defined, limited public fictional-athlete demo: no unresolved failures in the tested matrix, validated calendar writes require a review click, recoverable failures preserve the plan, and the final fixes are published. This is not an assurance that every possible AI response is correct or that the product is ready for unrestricted personal coaching at scale.
+
+Remaining production expansion requirements: durable multi-instance abuse/spending controls (the current 100/hour and three concurrent limits are per process), operating-budget/availability monitoring, and independent target-user evaluation. Personal saved plans, accounts, calendar integrations/export, next-week planning, cycling and overnight sessions remain outside this demo. No medical or training-effectiveness validation was performed. Generated coaching remains probabilistic; semantic tests and prompt fixes reduce observed failures but do not prove universal correctness. A human evaluator has not independently reviewed these outcomes.
+
+AI DISCLOSURE
+Codex designed and executed these QA scenarios, reviewed the responses, implemented fixes, wrote regression tests, merged/published the authorized release, and drafted this record. This is AI-assisted QA, not independent human research. Bernardo should review the submission package before handing it in. Nothing was submitted to Canvas.

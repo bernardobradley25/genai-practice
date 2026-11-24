@@ -1,0 +1,18 @@
+{
+  "id": "L13",
+  "name": "Cross-midnight workaround",
+  "expected": {
+    "none": true
+  },
+  "turns": [
+    {
+      "prompt": "Move Saturday’s 60-minute run to Saturday 11:30 PM. Prepare it exactly.",
+      "status": 200,
+      "ms": 1804,
+      "text": "I can’t stage that because a 60-minute session starting at 11:30 PM crosses midnight. Please choose a Saturday start time that ends by midnight (latest for 60 minutes: **11:00 PM**) or a Sunday time.",
+      "errors": []
+    }
+  ],
+  "pass": true,
+  "failure": ""
+}

@@ -1,0 +1,274 @@
+[
+  {
+    "id": "A01",
+    "name": "Malformed JSON has a safe JSON error",
+    "pass": true,
+    "ms": 29,
+    "details": {
+      "status": 400,
+      "headers": {
+        "connection": "keep-alive",
+        "content-length": "59",
+        "content-type": "application/json; charset=utf-8",
+        "date": "Tue, 24 Nov 2026 00:14:31 GMT",
+        "etag": "W/\"3b-hCc/O/q+QEC/1sLG4YvmsMXXRv4\"",
+        "keep-alive": "timeout=5",
+        "vary": "Origin"
+      },
+      "text": "{\"error\":\"The request could not be read. Send valid JSON.\"}"
+    }
+  },
+  {
+    "id": "A02",
+    "name": "Oversized body has a safe JSON 413",
+    "pass": true,
+    "ms": 3,
+    "details": {
+      "status": 413
+    }
+  },
+  {
+    "id": "A03",
+    "name": "Assistant-only request cannot trigger AI",
+    "pass": true,
+    "ms": 4,
+    "details": {
+      "status": 400,
+      "headers": {
+        "connection": "keep-alive",
+        "content-length": "48",
+        "content-type": "application/json; charset=utf-8",
+        "date": "Tue, 24 Nov 2026 00:14:31 GMT",
+        "etag": "W/\"30-5/4qQEK7j6TyZSiFO7lKJh6MFd0\"",
+        "keep-alive": "timeout=5",
+        "vary": "Origin"
+      },
+      "text": "{\"error\":\"The latest message must be from you.\"}"
+    }
+  },
+  {
+    "id": "A04",
+    "name": "Missing calendar slots rejected",
+    "pass": true,
+    "ms": 2,
+    "details": {
+      "status": 400,
+      "headers": {
+        "connection": "keep-alive",
+        "content-length": "70",
+        "content-type": "application/json; charset=utf-8",
+        "date": "Tue, 24 Nov 2026 00:14:31 GMT",
+        "etag": "W/\"46-Hr5JuhGQAIVPidCVqNTG25oaEbw\"",
+        "keep-alive": "timeout=5",
+        "vary": "Origin"
+      },
+      "text": "{\"error\":\"This week could not be read. Reset the demo and try again.\"}"
+    }
+  },
+  {
+    "id": "A05",
+    "name": "Invalid current time rejected",
+    "pass": true,
+    "ms": 2,
+    "details": {
+      "status": 400,
+      "headers": {
+        "connection": "keep-alive",
+        "content-length": "70",
+        "content-type": "application/json; charset=utf-8",
+        "date": "Tue, 24 Nov 2026 00:14:31 GMT",
+        "etag": "W/\"46-Hr5JuhGQAIVPidCVqNTG25oaEbw\"",
+        "keep-alive": "timeout=5",
+        "vary": "Origin"
+      },
+      "text": "{\"error\":\"This week could not be read. Reset the demo and try again.\"}"
+    }
+  },
+  {
+    "id": "A06",
+    "name": "Overlapping current week rejected",
+    "pass": true,
+    "ms": 1,
+    "details": {
+      "status": 400,
+      "headers": {
+        "connection": "keep-alive",
+        "content-length": "70",
+        "content-type": "application/json; charset=utf-8",
+        "date": "Tue, 24 Nov 2026 00:14:31 GMT",
+        "etag": "W/\"46-Hr5JuhGQAIVPidCVqNTG25oaEbw\"",
+        "keep-alive": "timeout=5",
+        "vary": "Origin"
+      },
+      "text": "{\"error\":\"This week could not be read. Reset the demo and try again.\"}"
+    }
+  },
+  {
+    "id": "A07",
+    "name": "Blank current session title rejected",
+    "pass": true,
+    "ms": 1,
+    "details": {
+      "status": 400,
+      "headers": {
+        "connection": "keep-alive",
+        "content-length": "70",
+        "content-type": "application/json; charset=utf-8",
+        "date": "Tue, 24 Nov 2026 00:14:31 GMT",
+        "etag": "W/\"46-Hr5JuhGQAIVPidCVqNTG25oaEbw\"",
+        "keep-alive": "timeout=5",
+        "vary": "Origin"
+      },
+      "text": "{\"error\":\"This week could not be read. Reset the demo and try again.\"}"
+    }
+  },
+  {
+    "id": "A08",
+    "name": "Contradictory weekday label rejected",
+    "pass": true,
+    "ms": 1,
+    "details": {
+      "status": 400,
+      "headers": {
+        "connection": "keep-alive",
+        "content-length": "70",
+        "content-type": "application/json; charset=utf-8",
+        "date": "Tue, 24 Nov 2026 00:14:31 GMT",
+        "etag": "W/\"46-Hr5JuhGQAIVPidCVqNTG25oaEbw\"",
+        "keep-alive": "timeout=5",
+        "vary": "Origin"
+      },
+      "text": "{\"error\":\"This week could not be read. Reset the demo and try again.\"}"
+    }
+  },
+  {
+    "id": "A09",
+    "name": "Truncated upstream prose is not a successful answer",
+    "pass": true,
+    "ms": 21,
+    "details": {
+      "status": 200,
+      "headers": {
+        "cache-control": "no-cache, no-transform",
+        "connection": "keep-alive",
+        "content-type": "text/event-stream",
+        "date": "Tue, 24 Nov 2026 00:14:31 GMT",
+        "transfer-encoding": "chunked",
+        "vary": "Origin"
+      },
+      "text": "data: {\"type\":\"delta\",\"content\":\"Incomplete coaching advice\"}\n\ndata: {\"type\":\"error\",\"message\":\"I couldn’t reach the coaching service. Your plan has not changed. Please try again.\"}\n\n"
+    }
+  },
+  {
+    "id": "A10",
+    "name": "Complete-looking tool without terminal finish is not offered",
+    "pass": true,
+    "ms": 5,
+    "details": {
+      "status": 200,
+      "headers": {
+        "cache-control": "no-cache, no-transform",
+        "connection": "keep-alive",
+        "content-type": "text/event-stream",
+        "date": "Tue, 24 Nov 2026 00:14:31 GMT",
+        "transfer-encoding": "chunked",
+        "vary": "Origin"
+      },
+      "text": "data: {\"type\":\"delta\",\"content\":\"LOCAL TEST FIXTURE — this response is scripted to verify the interface and validator. \"}\n\ndata: {\"type\":\"error\",\"message\":\"I couldn’t reach the coaching service. Your plan has not changed. Please try again.\"}\n\n"
+    }
+  },
+  {
+    "id": "A11",
+    "name": "Filtered upstream completion is recoverable error",
+    "pass": true,
+    "ms": 4,
+    "details": {
+      "status": 200,
+      "headers": {
+        "cache-control": "no-cache, no-transform",
+        "connection": "keep-alive",
+        "content-type": "text/event-stream",
+        "date": "Tue, 24 Nov 2026 00:14:31 GMT",
+        "transfer-encoding": "chunked",
+        "vary": "Origin"
+      },
+      "text": "data: {\"type\":\"delta\",\"content\":\"Partial response\"}\n\ndata: {\"type\":\"error\",\"message\":\"I couldn’t reach the coaching service. Your plan has not changed. Please try again.\"}\n\n"
+    }
+  },
+  {
+    "id": "A12",
+    "name": "Unknown tool is recoverable error",
+    "pass": true,
+    "ms": 3,
+    "details": {
+      "status": 503,
+      "headers": {
+        "cache-control": "no-cache, no-transform",
+        "connection": "keep-alive",
+        "content-length": "85",
+        "content-type": "text/event-stream; charset=utf-8",
+        "date": "Tue, 24 Nov 2026 00:14:31 GMT",
+        "etag": "W/\"55-5kH3TrFRBKy6j1M/7/nwI4MiSrs\"",
+        "vary": "Origin"
+      },
+      "text": "{\"error\":\"The coaching service is unavailable right now. Your plan has not changed.\"}"
+    }
+  },
+  {
+    "id": "A13",
+    "name": "Empty upstream response is recoverable error",
+    "pass": true,
+    "ms": 2,
+    "details": {
+      "status": 503,
+      "headers": {
+        "cache-control": "no-cache, no-transform",
+        "connection": "keep-alive",
+        "content-length": "85",
+        "content-type": "text/event-stream; charset=utf-8",
+        "date": "Tue, 24 Nov 2026 00:14:31 GMT",
+        "etag": "W/\"55-5kH3TrFRBKy6j1M/7/nwI4MiSrs\"",
+        "vary": "Origin"
+      },
+      "text": "{\"error\":\"The coaching service is unavailable right now. Your plan has not changed.\"}"
+    }
+  },
+  {
+    "id": "A14",
+    "name": "Malformed tool JSON cannot become a card",
+    "pass": true,
+    "ms": 2,
+    "details": {
+      "status": 200,
+      "headers": {
+        "cache-control": "no-cache, no-transform",
+        "connection": "keep-alive",
+        "content-type": "text/event-stream",
+        "date": "Tue, 24 Nov 2026 00:14:31 GMT",
+        "transfer-encoding": "chunked",
+        "vary": "Origin"
+      },
+      "text": "data: {\"type\":\"error\",\"message\":\"The proposed schedule could not be read. Ask for a new proposal. Your week is unchanged.\"}\n\n"
+    }
+  },
+  {
+    "id": "A15",
+    "name": "Burst of 20 stays bounded and recovers",
+    "pass": true,
+    "ms": 520,
+    "details": {
+      "accepted": 3,
+      "backpressured": 17,
+      "recovered": 200
+    }
+  },
+  {
+    "id": "A16",
+    "name": "Cancelling all occupied slots releases capacity",
+    "pass": true,
+    "ms": 369,
+    "details": {
+      "recovered": 200
+    }
+  }
+]

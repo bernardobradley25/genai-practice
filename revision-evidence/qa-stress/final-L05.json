@@ -1,0 +1,25 @@
+{
+  "id": "L05",
+  "name": "Negative recommendation acknowledgment",
+  "expected": {
+    "none": true
+  },
+  "turns": [
+    {
+      "prompt": "What if I move Thursday to Sunday? Just discuss the options.",
+      "status": 200,
+      "ms": 4523,
+      "text": "Moving the **Thursday steady run (40 min)** to **Sunday** is feasible as a straight swap, leaving Thursday as rest.\n\nOptions:\n\n1. **Move it unchanged to Sunday**\n   - Saturday remains the 60-minute long easy run.\n   - Sunday becomes 40 minutes steady, so the runs are back-to-back.\n   - Best only if Saturday truly stays relaxed and you feel recovered; it preserves the workout but reduces recovery after the long run.\n\n2. **Move a shortened easy version to Sunday**\n   - Keep Saturday’s long run protected.\n   - Sunday could be about **20 minutes easy/conversational**, rather than a steady effort.\n   - Lower recovery cost, but it no longer provides the original steady-run stimulus.\n\n3. **No make-up**\n   - Skip Thursday and retain Tuesday easy run, Wednesday soccer, and Saturday long easy run.\n   - This gives more recovery around soccer and the long run, at the cost of one run stimulus this week.\n\nMy conservative recommendation: **either no make-up or a short, easy Sunday run**—not the full 40-minute steady session—because Saturday’s long run is already adjacent. Do you like the shortened Sunday-easy option, or would you rather leave Sunday open?",
+      "errors": []
+    },
+    {
+      "prompt": "Yes, that sounds good, but I have not decided. Do not prepare anything.",
+      "status": 200,
+      "ms": 2040,
+      "text": "Understood—nothing will be changed yet.\n\nThe tentative conservative option is:\n- Leave **Thursday** open.\n- Keep **Saturday’s 60-minute long easy run** unchanged.\n- If you decide to run Sunday, make it **about 20 minutes easy and conversational**, not the original 40-minute steady workout.\n\nThat protects recovery better than placing the full steady run immediately after the long run.",
+      "errors": []
+    }
+  ],
+  "pass": true,
+  "failure": ""
+}

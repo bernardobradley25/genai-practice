@@ -1,0 +1,33 @@
+{
+  "id": "L11",
+  "name": "Boundary: back-to-back strength",
+  "expected": {
+    "id": "fri",
+    "time": "8:30 PM"
+  },
+  "turns": [
+    {
+      "prompt": "Move Friday strength to Wednesday 8:30 PM, immediately after the 75-minute soccer at 7:15 PM. Keep the 40-minute strength duration.",
+      "status": 200,
+      "ms": 1938,
+      "text": "",
+      "proposal": {
+        "impact": "Strength begins exactly when Wednesday soccer ends at 8:30 PM, so there is no time overlap. This keeps the 40-minute strength session but creates a demanding combined evening; Friday becomes open.",
+        "changes": [
+          {
+            "sport": "Strength",
+            "day": "Wednesday",
+            "time": "8:30 PM",
+            "title": "Strength + mobility",
+            "detail": "40 min · moderate",
+            "status": "moved",
+            "sessionId": "fri"
+          }
+        ]
+      },
+      "errors": []
+    }
+  ],
+  "pass": true,
+  "failure": ""
+}

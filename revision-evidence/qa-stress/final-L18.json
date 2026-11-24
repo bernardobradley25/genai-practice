@@ -1,0 +1,18 @@
+{
+  "id": "L18",
+  "name": "Unavailable swimming equipment",
+  "expected": {
+    "none": true
+  },
+  "turns": [
+    {
+      "prompt": "Replace Thursday with a swim, but I have no pool or open-water access all week. Prepare a 30-minute swim Thursday 6:30 PM.",
+      "status": 200,
+      "ms": 1803,
+      "text": "I can’t stage a swim without pool or open-water access. The calendar shouldn’t represent an unavailable session as completed/planned swimming.\n\nWould you like to keep Thursday as the current steady run, or replace it with a feasible supported activity you can do at **6:30 PM**?",
+      "errors": []
+    }
+  ],
+  "pass": true,
+  "failure": ""
+}

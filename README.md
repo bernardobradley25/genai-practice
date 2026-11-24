@@ -6,7 +6,7 @@ Reflow is a prototype coaching experience for adult amateur athletes balancing r
 
 **Reviewer links:** [Live prototype](https://reflow-training-coach.replit.app) · [GitHub source](https://github.com/bernardobradley25/genai-practice)
 
-**Release status:** Published and verified on November 23, 2026. Initial repairs ([PR #1](https://github.com/bernardobradley25/genai-practice/pull/1)), public-demo polish ([PR #2](https://github.com/bernardobradley25/genai-practice/pull/2)), and live-scenario fixes ([PR #3](https://github.com/bernardobradley25/genai-practice/pull/3), [PR #4](https://github.com/bernardobradley25/genai-practice/pull/4)) are merged. Replit serves application release `9677e92`. The final live suite passed all 12 expected scenario outcomes (18 model turns); 63 automated tests passed. Browser verification confirmed swimming review/apply/undo and correct coaching summaries before and after undo. See [the scenario record](revision-evidence/ai-scenarios/summary.txt).
+**Release status:** Published and verified on November 23, 2026. Application release `ff13bce` includes [adversarial QA repairs](https://github.com/bernardobradley25/genai-practice/pull/5) and [clarification follow-through](https://github.com/bernardobradley25/genai-practice/pull/6). Final verification passed **49 distinct QA cases** (25 live conversations, 16 API fault/load cases, eight browser workflows), plus **72 supporting regression checks**. The original 40-case baseline exposed 20 failures (50%). See [the complete QA release report](revision-evidence/qa-stress/QA%20release%20report.txt). Release assessment applies to the limited fictional-athlete demo; durable multi-instance abuse/spending controls and independent user evaluation remain required for broader production use.
 
 ### Feedback and response
 
@@ -19,6 +19,10 @@ The revision puts instructions and repository links inside the app, adds sample 
 A subsequent live evaluation ran 10 fictional scenarios (15 model turns): missed-run approval, soccer substitution, travel/surf, natural rescheduling, hypothetical discussion, swimming, completed-work protection, injury refusal, qualified agreement, and an impossible overlap. The raw before-fix transcripts are in [ai-scenarios](revision-evidence/ai-scenarios).
 
 The evaluation found five defects: approval/reschedule wording failed to enable the review tool; a travel proposal duplicated session edits; a swim was classified as Run; completed replacement soccer was omitted from the calendar; and discussion suggested a second run that the app cannot represent. Fixes broaden clear-intent recognition while retaining refusal/uncertainty checks, use one keyed final edit per session, add Swim throughout the API/calendar, support explicitly reported completed replacements, and align coaching options with calendar constraints. These fixes passed **48 logic tests and 15 API tests (63 total)**, full typechecking, builds, and local browser verification. The first live retest caught another approval variation: abbreviated weekdays (Wed, Fri) prevented agreement from enabling the review tool. That variation now has regression coverage. The final deployed retest passed all 12 expected outcomes, including the added half-session and unsupported-cycling cases. Full prompts, responses, proposals, and outcome checks are retained in the evidence folder. Live prose was also reviewed for consistency with each requested plan; this is not a validation of training effectiveness.
+
+### Adversarial QA follow-up
+
+The busy-athlete QA pass used calendar workarounds, constrained schedules, ambiguous clocks, copied notes, unsupported capabilities, injury refusals, malformed requests, incomplete model streams, long histories and concurrent load. Fixes validate the whole current calendar, require a terminal AI completion before offering a card, return safe parser errors, bound conversation history, and preserve direct intent through clarification. The local 20-request burst admitted three and backpressured 17, then recovered. All final raw transcripts and checks are retained in [qa-stress](revision-evidence/qa-stress); intentional rejection of invalid requests counts as a pass, not a product failure.
 
 ### Public demo polish
 
@@ -41,7 +45,7 @@ The release scope is a polished public demonstration using Jordan’s fictional 
 
 ### Revision test results
 
-Verification date: November 23, 2026. The latest suite passed **48 logic tests and 15 API integration tests (63 total)**. The initial revision passed 29 logic and 11 API tests (40 total); earlier logs are retained as historical evidence. Project type checking, frontend build, and API build passed. Browser checks used the revised frontend and actual API with a deterministic local OpenAI-compatible fixture. They did not call a live model or use Replit credits. The original deployed app was tested with live AI before revision. Post-publication checks also exercised the revised live AI app; see [the live verification record](revision-evidence/live-checks.txt).
+Verification date: November 23, 2026. The latest suite passed **57 logic tests and 15 API integration tests (72 regression checks)**, plus the separately recorded 16 fault/load cases. The initial revision passed 29 logic and 11 API tests (40 total); earlier logs are retained as historical evidence. Project type checking, frontend build, and API build passed. Browser checks used the revised frontend and actual API with a deterministic local OpenAI-compatible fixture. They did not call a live model or use Replit credits. The original deployed app was tested with live AI before revision. Post-publication checks also exercised the revised live AI app; see [the live verification record](revision-evidence/live-checks.txt).
 
 | Test | Input or action | Observed result | Result |
 | --- | --- | --- | --- |
@@ -72,6 +76,10 @@ node --experimental-strip-types --test scripts/revision-api.test.mjs
 # Optional deployed AI evaluation; uses Replit credits:
 REFLOW_LIVE_TEST=1 node --experimental-strip-types scripts/live-scenarios.mjs post-fix
 node --experimental-strip-types scripts/check-live-scenarios.mjs post-fix
+# Adversarial QA (local fixture server required for qa-api):
+node --experimental-strip-types --test scripts/qa-logic.test.mjs
+node --experimental-strip-types scripts/qa-api.mjs final
+REFLOW_LIVE_TEST=1 node --experimental-strip-types scripts/qa-live.mjs final
 ```
 
 ### Short demonstration

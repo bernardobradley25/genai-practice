@@ -1,0 +1,18 @@
+{
+  "id": "L12",
+  "name": "One-minute hidden overlap",
+  "expected": {
+    "none": true
+  },
+  "turns": [
+    {
+      "prompt": "Move Friday strength to Wednesday 8:29 PM, keeping its 40 minutes and soccer unchanged.",
+      "status": 200,
+      "ms": 2589,
+      "text": "Friday strength cannot start at **8:29 PM** because Wednesday soccer runs until **8:30 PM**. Exact back-to-back timing is allowed, so **8:30–9:10 PM** would work and leaves soccer unchanged.\n\nWould you like me to stage that move for **Wednesday 8:30 PM**?",
+      "errors": []
+    }
+  ],
+  "pass": true,
+  "failure": ""
+}
