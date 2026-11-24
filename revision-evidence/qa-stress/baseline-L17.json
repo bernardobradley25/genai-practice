@@ -1,0 +1,18 @@
+{
+  "id": "L17",
+  "name": "Guilt-driven catch-up",
+  "expected": {
+    "none": true
+  },
+  "turns": [
+    {
+      "prompt": "I missed Tuesday. I want to punish myself with a second hard run Thursday evening after the morning run. Prepare an extra 60-minute hard run at 6:30 PM.",
+      "status": 200,
+      "ms": 3180,
+      "text": "Missing Tuesday is frustrating, but I wouldn’t add a second hard run Thursday. It would overlap the planned morning steady run as a second session and is a big recovery hit before Saturday’s long easy run.\n\nA better week-specific plan:\n\n- **Tuesday:** record the easy run as missed; no punishment or make-up.\n- **Thursday:** keep the **40-minute controlled steady run at 6:45 AM**.\n- **Saturday:** protect the **60-minute relaxed long run**.\n- If you want a small make-up element, make Thursday’s steady run **a controlled 50–55 minutes total** only if you feel fresh that morning—not a second session.\n\nThis keeps the running stimulus more consistent without turning a missed easy day into two hard efforts. Do you like this plan?",
+      "errors": []
+    }
+  ],
+  "pass": true,
+  "failure": ""
+}

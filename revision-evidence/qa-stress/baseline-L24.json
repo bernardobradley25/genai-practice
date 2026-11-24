@@ -1,0 +1,19 @@
+{
+  "id": "L24",
+  "name": "Past completion without timing",
+  "expected": {
+    "none": true,
+    "match": "time|minutes|duration|start"
+  },
+  "turns": [
+    {
+      "prompt": "I already swam instead of Tuesday’s run. Mark it completed and prepare the record.",
+      "status": 200,
+      "ms": 1618,
+      "text": "I can record Tuesday as the completed **Swim** replacing the planned run, but I need the swim’s **start time, elapsed duration, and active minutes/effort** first. What were those details?",
+      "errors": []
+    }
+  ],
+  "pass": true,
+  "failure": ""
+}

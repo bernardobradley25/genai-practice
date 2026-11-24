@@ -1,0 +1,33 @@
+{
+  "id": "L06",
+  "name": "Ambiguous clock time",
+  "expected": {
+    "none": true,
+    "match": "AM|PM|morning|evening|clarif"
+  },
+  "turns": [
+    {
+      "prompt": "Move Saturday’s run to 7. Keep its duration. Prepare it.",
+      "status": 200,
+      "ms": 1566,
+      "text": "",
+      "proposal": {
+        "impact": "Moves the long easy run later on Saturday while keeping its 60-minute duration and relaxed intent.",
+        "changes": [
+          {
+            "sport": "Run",
+            "day": "Saturday",
+            "time": "7:00 AM",
+            "title": "Long easy run",
+            "detail": "60 min · relaxed",
+            "status": "moved",
+            "sessionId": "sat"
+          }
+        ]
+      },
+      "errors": []
+    }
+  ],
+  "pass": false,
+  "failure": "unexpected proposal\n+ actual - expected\n\n+ {\n+   changes: [\n+     {\n+       day: 'Saturday',\n+       detail: '60 min · relaxed',\n+       sessionId: 'sat',\n+       sport: 'Run',\n+       status: 'moved',\n+       time: '7:00 AM',\n+       title: 'Long easy run'\n+     }\n+   ],\n+   impact: 'Moves the long easy run later on Saturday while keeping its 60-minute duration and relaxed intent.'\n+ }\n- undefined\n"
+}

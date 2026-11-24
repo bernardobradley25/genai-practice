@@ -1,0 +1,143 @@
+[
+  {
+    "id": "A01",
+    "name": "Malformed JSON has a safe JSON error",
+    "pass": false,
+    "ms": 29,
+    "error": "The input did not match the regular expression /application\\/json/. Input:\n\n'text/html; charset=utf-8'\n"
+  },
+  {
+    "id": "A02",
+    "name": "Oversized body has a safe JSON 413",
+    "pass": false,
+    "ms": 3,
+    "error": "The input did not match the regular expression /application\\/json/. Input:\n\n'text/html; charset=utf-8'\n"
+  },
+  {
+    "id": "A03",
+    "name": "Assistant-only request cannot trigger AI",
+    "pass": true,
+    "ms": 3,
+    "details": {
+      "status": 400,
+      "headers": {
+        "connection": "keep-alive",
+        "content-length": "48",
+        "content-type": "application/json; charset=utf-8",
+        "date": "Mon, 23 Nov 2026 23:59:16 GMT",
+        "etag": "W/\"30-5/4qQEK7j6TyZSiFO7lKJh6MFd0\"",
+        "keep-alive": "timeout=5",
+        "vary": "Origin"
+      },
+      "text": "{\"error\":\"The latest message must be from you.\"}"
+    }
+  },
+  {
+    "id": "A04",
+    "name": "Missing calendar slots rejected",
+    "pass": false,
+    "ms": 18,
+    "error": "Expected values to be strictly equal:\n\n200 !== 400\n"
+  },
+  {
+    "id": "A05",
+    "name": "Invalid current time rejected",
+    "pass": false,
+    "ms": 2,
+    "error": "Expected values to be strictly equal:\n\n200 !== 400\n"
+  },
+  {
+    "id": "A06",
+    "name": "Overlapping current week rejected",
+    "pass": false,
+    "ms": 6,
+    "error": "Expected values to be strictly equal:\n\n200 !== 400\n"
+  },
+  {
+    "id": "A07",
+    "name": "Blank current session title rejected",
+    "pass": false,
+    "ms": 2,
+    "error": "Expected values to be strictly equal:\n\n200 !== 400\n"
+  },
+  {
+    "id": "A08",
+    "name": "Contradictory weekday label rejected",
+    "pass": false,
+    "ms": 2,
+    "error": "Expected values to be strictly equal:\n\n200 !== 400\n"
+  },
+  {
+    "id": "A09",
+    "name": "Truncated upstream prose is not a successful answer",
+    "pass": false,
+    "ms": 2,
+    "error": "missing failure event"
+  },
+  {
+    "id": "A10",
+    "name": "Complete-looking tool without terminal finish is not offered",
+    "pass": false,
+    "ms": 3,
+    "error": "missing failure event"
+  },
+  {
+    "id": "A11",
+    "name": "Filtered upstream completion is recoverable error",
+    "pass": false,
+    "ms": 2,
+    "error": "missing failure event"
+  },
+  {
+    "id": "A12",
+    "name": "Unknown tool is recoverable error",
+    "pass": false,
+    "ms": 1,
+    "error": "missing failure event"
+  },
+  {
+    "id": "A13",
+    "name": "Empty upstream response is recoverable error",
+    "pass": false,
+    "ms": 3,
+    "error": "missing failure event"
+  },
+  {
+    "id": "A14",
+    "name": "Malformed tool JSON cannot become a card",
+    "pass": true,
+    "ms": 1,
+    "details": {
+      "status": 200,
+      "headers": {
+        "cache-control": "no-cache, no-transform",
+        "connection": "keep-alive",
+        "content-type": "text/event-stream",
+        "date": "Mon, 23 Nov 2026 23:59:16 GMT",
+        "transfer-encoding": "chunked",
+        "vary": "Origin"
+      },
+      "text": "data: {\"type\":\"error\",\"message\":\"The proposed schedule could not be read. Ask for a new proposal. Your week is unchanged.\"}\n\n"
+    }
+  },
+  {
+    "id": "A15",
+    "name": "Burst of 20 stays bounded and recovers",
+    "pass": true,
+    "ms": 517,
+    "details": {
+      "accepted": 3,
+      "backpressured": 17,
+      "recovered": 200
+    }
+  },
+  {
+    "id": "A16",
+    "name": "Cancelling all occupied slots releases capacity",
+    "pass": true,
+    "ms": 370,
+    "details": {
+      "recovered": 200
+    }
+  }
+]

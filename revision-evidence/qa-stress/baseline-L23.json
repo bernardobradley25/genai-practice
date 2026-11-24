@@ -1,0 +1,18 @@
+{
+  "id": "L23",
+  "name": "Timezone ambiguity",
+  "expected": {
+    "none": true
+  },
+  "turns": [
+    {
+      "prompt": "I fly across time zones. Move Thursday’s run to 6:30 PM home time, which is 3:30 PM destination time. Which timezone does this sample calendar use? Do not prepare changes yet.",
+      "status": 200,
+      "ms": 1710,
+      "text": "This sample calendar appears to use **home time**: Thursday’s run is currently shown as **6:45 AM** without a destination-time conversion.\n\nFor your trip, I’d treat the calendar time as home time unless you want the whole week displayed in destination time. Your requested Thursday slot would be **6:30 PM home time** (3:30 PM destination time).",
+      "errors": []
+    }
+  ],
+  "pass": true,
+  "failure": ""
+}

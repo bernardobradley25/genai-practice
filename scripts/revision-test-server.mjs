@@ -12,6 +12,7 @@ const fixture = http.createServer(async (req, res) => {
   let body = ''; for await (const part of req) body += part;
   const input = JSON.parse(body);
   const text = input.messages.at(-1).content.toLowerCase();
+  if (text.includes('qa burst')) await new Promise(resolve=>setTimeout(resolve,500));
   if (text.includes('slow reply')) {
     const timer = setTimeout(() => { if (!res.destroyed) { res.writeHead(503); res.end('{"error":{"message":"Slow fixture"}}'); } }, 15000);
     res.on('close', () => clearTimeout(timer));
@@ -27,10 +28,16 @@ const fixture = http.createServer(async (req, res) => {
   if (text.includes('completed soccer')) changes=[{sessionId:'tue',sport:'Soccer',day:'Tuesday',time:'7:00 PM',title:'Soccer instead of run',detail:'90 min elapsed · 60 active · hard',status:'done'}];
   res.writeHead(200, {'Content-Type':'text/event-stream'});
   const send = (delta) => res.write(`data: ${JSON.stringify({choices:[{index:0,delta}]})}\n\n`);
+  if(text.includes('qa empty')) {res.end('data: [DONE]\n\n');return;}
+  if(text.includes('qa truncated text')) {send({content:'Incomplete coaching advice'});res.end();return;}
+  if(text.includes('qa filtered')) {send({content:'Partial response'});res.write(`data: ${JSON.stringify({choices:[{index:0,delta:{},finish_reason:'content_filter'}]})}\n\n`);res.end('data: [DONE]\n\n');return;}
+  if(text.includes('qa unknown tool')) {send({tool_calls:[{index:0,function:{name:'unexpected_tool',arguments:'{}'}}]});res.write(`data: ${JSON.stringify({choices:[{index:0,delta:{},finish_reason:'tool_calls'}]})}\n\n`);res.end('data: [DONE]\n\n');return;}
+  if(text.includes('qa malformed tool')) {send({tool_calls:[{index:0,function:{name:'prepare_week_reflow',arguments:'{bad json'}}]});res.write(`data: ${JSON.stringify({choices:[{index:0,delta:{},finish_reason:'tool_calls'}]})}\n\n`);res.end('data: [DONE]\n\n');return;}
   send({content:'LOCAL TEST FIXTURE — this response is scripted to verify the interface and validator. '});
   if (input.tools) send({tool_calls:[{index:0,id:'fixture-call',type:'function',function:{name:'prepare_week_reflow',arguments:JSON.stringify({impact:'LOCAL TEST FIXTURE — review these changes. No live AI recommendation was generated.',changes:Object.fromEntries(['mon','tue','wed','thu','fri','sat','sun'].map(id=>{const change=changes.find(item=>item.sessionId===id);if(!change)return [id,null];const {sessionId,...fields}=change;return [id,fields];}))})}}]});
   else if (text.includes('proposal status')) send({content: input.messages.slice(0, -1).filter(message => message.content.includes('Proposal status:')).map(message => message.content).join('\n') || 'No proposal context received.'});
   else send({content:'For a missed run, mark Tuesday missed and replace Thursday’s steady run with a 35-minute easy run at 6:30 PM. Do you like this plan?'});
+  if(!text.includes('qa truncated tool'))res.write(`data: ${JSON.stringify({choices:[{index:0,delta:{},finish_reason:input.tools?'tool_calls':'stop'}]})}\n\n`);
   res.end('data: [DONE]\n\n');
 }).listen(20370,'127.0.0.1');
 const web = http.createServer(async (req,res) => {

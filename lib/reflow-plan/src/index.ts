@@ -157,3 +157,19 @@ export function isSameWeek(a: Session[], b: Session[]): boolean {
   return JSON.stringify(a) === JSON.stringify(b);
 }
 
+
+/** Validate the entire supplied stateless demo, not only newly proposed edits. */
+export function validateCurrentWeek(sessions: Session[]): string | null {
+  if (sessions.length !== initialWeek.length || new Set(sessions.map(s => s.id)).size !== initialWeek.length
+    || sessions.some(s => !initialWeek.some(original => original.id === s.id))) return 'The sample week needs all seven session slots.';
+  for (const session of sessions) {
+    if (!session.title.trim() || !days.includes(session.day) || session.shortDay !== session.day.slice(0, 3).toUpperCase()) return 'A session has an invalid title or weekday label.';
+  }
+  // Reuse every interval/cap rule without modifying the input or completed records.
+  const probe = sessions.find(s => s.status !== 'done');
+  const source = probe ? sessions : sessions.map((s, i) => i === 0 ? { ...s, status: 'planned' as const } : s);
+  const target = probe ?? source[0];
+  const { id, shortDay: _shortDay, ...change } = target;
+  const result = validatePlanProposal(source, { impact: 'Validate current week', changes: [{ ...change, sessionId: id }] });
+  return result.ok ? null : result.error;
+}

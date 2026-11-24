@@ -1,0 +1,25 @@
+{
+  "id": "L05",
+  "name": "Negative recommendation acknowledgment",
+  "expected": {
+    "none": true
+  },
+  "turns": [
+    {
+      "prompt": "What if I move Thursday to Sunday? Just discuss the options.",
+      "status": 200,
+      "ms": 4012,
+      "text": "Moving Thursday’s **40-minute steady run** to Sunday is workable, but it shifts the week’s recovery pattern:\n\n- **Move it unchanged to Sunday:** keeps the steady session, but places it the day after Saturday’s 60-minute long run. That can be a fairly demanding back-to-back, even if both are controlled.\n- **Shorten it on Sunday:** make Sunday an easy-to-steady 20–30 minutes rather than the full 40. This preserves some running rhythm while protecting recovery after the long run.\n- **No Thursday/Sunday steady run this week:** Tuesday easy, Wednesday soccer, and Saturday long run already give you useful aerobic work. This is the most recovery-friendly option.\n\nI’d lean toward **not moving the full steady run**. If Thursday truly won’t work, my preferred plan would be to keep Saturday’s long run relaxed and use Sunday only for a **short, easy recovery-style run—or rest if you feel tired**—rather than trying to replicate Thursday’s steady effort.\n\nDo you like that approach, or were you hoping to keep the full 40-minute steady session?",
+      "errors": []
+    },
+    {
+      "prompt": "Yes, that sounds good, but I have not decided. Do not prepare anything.",
+      "status": 200,
+      "ms": 1758,
+      "text": "Sounds good—no changes yet.\n\nFor now, treat the **full Thursday steady run as optional**: if you move it, favor a **short, easy Sunday run** after Saturday’s long run rather than a full 40-minute steady effort. If recovery feels questionable, skipping it is the more conservative choice.",
+      "errors": []
+    }
+  ],
+  "pass": true,
+  "failure": ""
+}

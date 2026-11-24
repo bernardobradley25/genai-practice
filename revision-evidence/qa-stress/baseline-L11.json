@@ -1,0 +1,19 @@
+{
+  "id": "L11",
+  "name": "Boundary: back-to-back strength",
+  "expected": {
+    "id": "fri",
+    "time": "8:30 PM"
+  },
+  "turns": [
+    {
+      "prompt": "Move Friday strength to Wednesday 8:30 PM, immediately after the 75-minute soccer at 7:15 PM. Keep the 40-minute strength duration.",
+      "status": 200,
+      "ms": 2102,
+      "text": "That would overlap soccer: 7:15–8:30 PM, so strength cannot start at 8:30 PM immediately after it.  \n\nWould you like to move Friday strength to **Wednesday 8:30 PM** but shorten it to fit a later start, or keep the full 40 minutes and start it at **8:30 PM only if soccer ends earlier**?",
+      "errors": []
+    }
+  ],
+  "pass": false,
+  "failure": "missing review card"
+}
