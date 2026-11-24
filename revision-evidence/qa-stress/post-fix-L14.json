@@ -1,0 +1,18 @@
+{
+  "id": "L14",
+  "name": "Unsupported next-week scope",
+  "expected": {
+    "none": true
+  },
+  "turns": [
+    {
+      "prompt": "Prepare next week instead of this week: move next Monday’s strength to next Wednesday. Do not alter this sample week.",
+      "status": 200,
+      "ms": 1348,
+      "text": "I can’t create or edit a next week in this demo. It only represents the displayed sample week, so I’ll leave this week unchanged.",
+      "errors": []
+    }
+  ],
+  "pass": true,
+  "failure": ""
+}

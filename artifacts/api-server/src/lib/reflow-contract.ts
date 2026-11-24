@@ -16,6 +16,12 @@ export function hasClearReflowIntent(messages: Array<{ role: string; content: st
   if (direct) return true;
 
   const previous = messages.slice(0, -1).reverse().find(message => message.role === 'assistant')?.content ?? '';
+  // Completing a requested clarification continues the earlier edit intent. It
+  // does not promote an earlier hypothetical question into authorization.
+  const priorUser = messages.slice(0, -1).findLastIndex(message => message.role === 'user');
+  if (/\b(?:time|duration|am|pm|minutes|start)\b/i.test(previous) && previous.includes('?')
+    && /\b(?:\d{1,2}(?::\d{2})?\s*(?:am|pm)|(?:[01]\d|2[0-3]):[0-5]\d|\d+\s*min(?:utes)?)\b/i.test(text)
+    && priorUser >= 0 && hasClearReflowIntent(messages.slice(0, priorUser + 1))) return true;
   // A specific recommendation is enough context even if the model forgot its closing question.
   const hasPlan = /\b(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|Mon|Tue|Tues|Wed|Thu|Thur|Thurs|Fri|Sat|Sun)\b/i.test(previous)
     && /\b(?:keep|mark|move|replace|shorten|extend|skip|rest|cancel|recommend|plan)\b/i.test(previous);

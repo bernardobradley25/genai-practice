@@ -2,10 +2,14 @@ $ pnpm run typecheck:libs && pnpm -r --filter "./artifacts/**" --filter "./scrip
 $ tsc --build
 Scope: 4 of 11 workspace projects
 artifacts/api-server typecheck$ tsc -p tsconfig.json --noEmit
-scripts typecheck$ tsc -p tsconfig.json --noEmit
 artifacts/mockup-sandbox typecheck$ tsc -p tsconfig.json --noEmit
 artifacts/reflow-coach typecheck$ tsc -p tsconfig.json --noEmit
+scripts typecheck$ tsc -p tsconfig.json --noEmit
 scripts typecheck: Done
-artifacts/api-server typecheck: Done
-artifacts/reflow-coach typecheck: Done
-artifacts/mockup-sandbox typecheck: Done
+artifacts/api-server typecheck: src/lib/reflow-contract.ts(21,43): error TS2550: Property 'findLastIndex' does not exist on type '{ role: string; content: string; }[]'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2023' or later.
+artifacts/api-server typecheck: src/lib/reflow-contract.ts(21,57): error TS7006: Parameter 'message' implicitly has an 'any' type.
+artifacts/api-server typecheck: Failed
+/Users/bernardochalaca/Documents/ChatGPT/Gen AI/reflow/artifacts/api-server:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @workspace/api-server@0.0.0 typecheck: `tsc -p tsconfig.json --noEmit`
+Exit status 2
+[ELIFECYCLE] Command failed with exit code 2.

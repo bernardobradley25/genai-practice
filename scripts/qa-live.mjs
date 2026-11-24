@@ -28,6 +28,7 @@ const cases=[
  ['L21','User corrects assistant time',['Move Saturday’s run to 10 AM Saturday, same 60 minutes.','Actually, make it 10:30 AM Saturday, still 60 minutes. Prepare the corrected version.'],{id:'sat',time:'10:30 AM'}],
  ['L22','Mixed rejection and new request',['Move Saturday’s run to 10 AM, same duration.','No, keep Saturday at 9 AM. Instead move Friday strength to Friday 6 PM, same 40 minutes. Prepare only that.'],{id:'fri',time:'6:00 PM',only:'fri'}],
  ['L23','Timezone ambiguity','I fly across time zones. Move Thursday’s run to 6:30 PM home time, which is 3:30 PM destination time. Which timezone does this sample calendar use? Do not prepare changes yet.',{none:true}],
+ ['L25','Clarification answer completes a direct edit',['Move Saturday’s run to 7. Keep its duration. Prepare it.','7 PM please, same Saturday and same 60 minutes.'],{id:'sat',time:'7:00 PM'}],
  ['L24','Past completion without timing','I already swam instead of Tuesday’s run. Mark it completed and prepare the record.',{none:true,match:'time|minutes|duration|start'}],
 ];
 const selected=new Set(process.argv.slice(3));const report=[];

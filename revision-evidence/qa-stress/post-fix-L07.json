@@ -1,0 +1,18 @@
+{
+  "id": "L07",
+  "name": "Contradictory availability",
+  "expected": {
+    "none": true
+  },
+  "turns": [
+    {
+      "prompt": "Move Thursday’s run to 6:30 PM, but I am only free 7:00–8:00 PM that day. Keep 40 minutes. Prepare the plan.",
+      "status": 200,
+      "ms": 1833,
+      "text": "Those times conflict: a 40-minute run starting at **6:30 PM** would run until **7:10 PM**, but you’re only free from **7:00–8:00 PM**.\n\nWhat start time within that window would you like—e.g., **7:00 PM** for the full 40 minutes?",
+      "errors": []
+    }
+  ],
+  "pass": true,
+  "failure": ""
+}

@@ -1,0 +1,19 @@
+{
+  "id": "L06",
+  "name": "Ambiguous clock time",
+  "expected": {
+    "none": true,
+    "match": "AM|PM|morning|evening|clarif"
+  },
+  "turns": [
+    {
+      "prompt": "Move Saturday’s run to 7. Keep its duration. Prepare it.",
+      "status": 200,
+      "ms": 274,
+      "text": "Do you mean AM or PM for that start time? I will leave the calendar unchanged until the time is clear.",
+      "errors": []
+    }
+  ],
+  "pass": true,
+  "failure": ""
+}

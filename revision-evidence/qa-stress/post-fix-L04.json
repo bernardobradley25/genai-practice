@@ -1,0 +1,33 @@
+{
+  "id": "L04",
+  "name": "Conversational shorthand",
+  "expected": {
+    "id": "sat",
+    "time": "10:00 AM"
+  },
+  "turns": [
+    {
+      "prompt": "Saturday at 10 AM for the same 60-minute long run, please. Prepare that change and leave everything else alone.",
+      "status": 200,
+      "ms": 1718,
+      "text": "",
+      "proposal": {
+        "impact": "Moves the planned long easy run one hour later on Saturday; all other sessions stay unchanged.",
+        "changes": [
+          {
+            "sport": "Run",
+            "day": "Saturday",
+            "time": "10:00 AM",
+            "title": "Long easy run",
+            "detail": "60 min · relaxed",
+            "status": "moved",
+            "sessionId": "sat"
+          }
+        ]
+      },
+      "errors": []
+    }
+  ],
+  "pass": true,
+  "failure": ""
+}
