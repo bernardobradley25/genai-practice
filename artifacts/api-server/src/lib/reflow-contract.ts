@@ -3,15 +3,17 @@ export function hasClearReflowIntent(messages: Array<{ role: string; content: st
   const latest = messages.at(-1);
   if (!latest || latest.role !== 'user') return false;
   const text = latest.content.trim().toLowerCase().replace(/[’‘]/g, "'");
-  // Qualified agreement, hypothetical discussion and explicit refusal stay read-only.
-  if (!text || /\b(maybe|perhaps|not sure|what if|i wonder|explore|compare|explain|wait|hold on|not yet|hold off|before i decide|still deciding|unless)\b/.test(text)
-    || /\b(?:do not|don't|never)\s+(?:prepare|stage|change|move|reschedule|update|reflow)\b/.test(text)
-    || /\bno\s+(?:proposal|changes?|edits?)\b/.test(text)) return false;
-
-  const edit = '(?:prepare|stage|reflow|reschedule|apply|make|update|change|move|replace|switch|add|shorten|extend|skip|mark|set|cancel|remove)';
-  const polite = "(?:(?:please|can you|could you|would you|let's|actually,)\\s+)*";
-  if (new RegExp('^' + polite + edit + '\\b').test(text)
-    || new RegExp("^(?:i want you to|i want to|i'd like you to|i'd like to)\\s+" + edit + '\\b').test(text)) return true;
+  // Global refusal/uncertainty is read-only. A protected session in a separate
+  // clause ("don't change Monday; move Saturday") must not veto the requested edit.
+  if (!text || /\b(maybe|perhaps|not sure|what if|i wonder|wait|hold on|not yet|hold off|before i decide|still deciding|not decided|unless)\b/.test(text)
+    || /\bno\s+(?:proposal|changes?|edits?)\b/.test(text)
+    || /\b(?:do not|don't|never)\s+(?:prepare|stage|reflow)\b/.test(text)) return false;
+  const clauses = text.split(/[.;!?\n]|\b(?:and|but|instead)\b/);
+  const edit = /\b(?:prepare|stage|reflow|reschedule|apply|make|update|change|move|replace|switch|add|shorten|extend|skip|mark|set|cancel|remove|cambia|cambiar|mueve|prepara|preparar)\b/;
+  const direct = clauses.some(clause => !/\b(?:do not|don't|never|not to|no)\b/.test(clause)
+    && !/\b(?:what|whether|would|could|should|explore|compare|explain)\b/.test(clause.replace(/\b(?:could|would) you\b/g, ''))
+    && edit.test(clause));
+  if (direct) return true;
 
   const previous = messages.slice(0, -1).reverse().find(message => message.role === 'assistant')?.content ?? '';
   // A specific recommendation is enough context even if the model forgot its closing question.
@@ -35,4 +37,10 @@ export function proposalFromTool(value: unknown): unknown {
     return { ...change, sessionId };
   });
   return { impact: input.impact, changes };
+}
+
+/** A bare 12-hour time must not silently inherit the original session's AM/PM. */
+export function needsClockClarification(content: string): boolean {
+  if (/\b(?:am|pm|a\.m\.|p\.m\.|morning|afternoon|evening|night|noon|midnight)\b/i.test(content)) return false;
+  return /\b(?:at|to)\s+(?:1[0-2]|[1-9])(?::[0-5]\d)?(?=\s*[,.;!?]|\s*$)/i.test(content);
 }

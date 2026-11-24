@@ -1,0 +1,35 @@
+{
+  "id": "L09",
+  "name": "Elapsed versus active soccer time",
+  "expected": {
+    "id": "tue",
+    "sport": "Soccer",
+    "status": "done",
+    "duration": 90
+  },
+  "turns": [
+    {
+      "prompt": "Replace Tuesday’s planned run with the soccer I already completed Tuesday at 7 PM. I was there 90 minutes, played 45 active minutes at 7/10, with lots of stops. Prepare just that record.",
+      "status": 200,
+      "ms": 2095,
+      "text": "",
+      "proposal": {
+        "impact": "Tuesday’s planned easy run is replaced with the soccer you completed: 90 minutes elapsed with 45 active minutes at 7/10 and frequent stops. This records the actual cross-training; it is not a direct substitute for the run’s specific stimulus.",
+        "changes": [
+          {
+            "sport": "Soccer",
+            "day": "Tuesday",
+            "time": "7:00 PM",
+            "title": "Soccer",
+            "detail": "90 min elapsed · 45 min active · effort 7/10 · frequent stops; completed",
+            "status": "done",
+            "sessionId": "tue"
+          }
+        ]
+      },
+      "errors": []
+    }
+  ],
+  "pass": true,
+  "failure": ""
+}

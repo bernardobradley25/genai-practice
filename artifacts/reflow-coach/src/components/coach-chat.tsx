@@ -10,6 +10,8 @@ import {
   type Session,
 } from '../coaching-logic';
 
+import { boundedHistory } from '../chat-history';
+
 type ChatRole = 'user' | 'assistant';
 
 type ChatMessage = {
@@ -179,16 +181,15 @@ export function CoachChat({ week, setWeek, conversationKey, onNewConversation }:
     }, { once: true });
 
     try {
-      const conversation = [...messages, userMessage]
+      const conversation = boundedHistory([...messages, userMessage]
         .filter((item) => item.includeInHistory)
-        .slice(-24)
         .map((item) => {
           if (!item.planUpdate) return { role: item.role, content: item.content.slice(0, 3000) };
           const state = item.planUpdateApplied ? 'applied earlier; current calendar is authoritative'
             : item.planUpdateDismissed ? 'dismissed by the athlete; not applied'
             : item.planBaseWeek && !isSameWeek(item.planBaseWeek, week) ? 'outdated; not applied' : 'pending review; not applied';
           return { role: item.role, content: `${item.content.slice(0, 600)}\n${proposalHistory(item.planUpdate, state)}`.slice(0, 3000) };
-        });
+        }));
       const response = await fetch('/api/reflow/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

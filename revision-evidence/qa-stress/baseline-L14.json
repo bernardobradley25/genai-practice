@@ -1,0 +1,18 @@
+{
+  "id": "L14",
+  "name": "Unsupported next-week scope",
+  "expected": {
+    "none": true
+  },
+  "turns": [
+    {
+      "prompt": "Prepare next week instead of this week: move next Monday’s strength to next Wednesday. Do not alter this sample week.",
+      "status": 200,
+      "ms": 1652,
+      "text": "I only have this sample week’s calendar available, so I can’t stage changes to next week without its sessions. Please share next week’s plan (especially Monday and Wednesday, including times), and I’ll move that strength session without altering this week.",
+      "errors": []
+    }
+  ],
+  "pass": true,
+  "failure": ""
+}

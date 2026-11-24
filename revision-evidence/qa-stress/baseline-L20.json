@@ -1,0 +1,19 @@
+{
+  "id": "L20",
+  "name": "Spanish calendar request",
+  "expected": {
+    "id": "sat",
+    "time": "10:00 AM"
+  },
+  "turns": [
+    {
+      "prompt": "Por favor, cambia la carrera del sábado a las 10:00 de la mañana del sábado. Mantén los 60 minutos y el resto igual. Prepara el cambio para revisar.",
+      "status": 200,
+      "ms": 1484,
+      "text": "Puedo cambiar la carrera larga del sábado a las **10:00 AM**, manteniendo los **60 minutos**, el esfuerzo relajado y todo lo demás igual. ¿Te parece bien este plan?",
+      "errors": []
+    }
+  ],
+  "pass": false,
+  "failure": "missing review card"
+}
