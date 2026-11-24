@@ -1,0 +1,12 @@
+[
+  {
+    "id": "L25",
+    "name": "Clarification answer completes a direct edit",
+    "expected": {
+      "id": "sat",
+      "time": "7:00 PM"
+    },
+    "pass": false,
+    "failure": "missing review card"
+  }
+]

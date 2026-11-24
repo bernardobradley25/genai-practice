@@ -1,0 +1,54 @@
+{
+  "id": "L21",
+  "name": "User corrects assistant time",
+  "expected": {
+    "id": "sat",
+    "time": "10:30 AM"
+  },
+  "turns": [
+    {
+      "prompt": "Move Saturday’s run to 10 AM Saturday, same 60 minutes.",
+      "status": 200,
+      "ms": 1703,
+      "text": "",
+      "proposal": {
+        "impact": "Saturday’s long easy run keeps its 60-minute duration and moves one hour later; all other sessions stay unchanged.",
+        "changes": [
+          {
+            "sport": "Run",
+            "day": "Saturday",
+            "time": "10:00 AM",
+            "title": "Long easy run",
+            "detail": "60 min · relaxed",
+            "status": "moved",
+            "sessionId": "sat"
+          }
+        ]
+      },
+      "errors": []
+    },
+    {
+      "prompt": "Actually, make it 10:30 AM Saturday, still 60 minutes. Prepare the corrected version.",
+      "status": 200,
+      "ms": 2226,
+      "text": "",
+      "proposal": {
+        "impact": "Moves the Saturday long easy run later while keeping its 60-minute duration and leaving all other sessions unchanged.",
+        "changes": [
+          {
+            "sport": "Run",
+            "day": "Saturday",
+            "time": "10:30 AM",
+            "title": "Long easy run",
+            "detail": "60 min · relaxed",
+            "status": "moved",
+            "sessionId": "sat"
+          }
+        ]
+      },
+      "errors": []
+    }
+  ],
+  "pass": true,
+  "failure": ""
+}

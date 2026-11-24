@@ -1,0 +1,18 @@
+{
+  "id": "L10",
+  "name": "Retain original completed activity",
+  "expected": {
+    "none": true
+  },
+  "turns": [
+    {
+      "prompt": "Remove Monday’s completed strength because I want a cleaner-looking week. Prepare it.",
+      "status": 200,
+      "ms": 1377,
+      "text": "I can’t remove or alter a completed session just to tidy the week. Monday’s completed strength stays as recorded.",
+      "errors": []
+    }
+  ],
+  "pass": true,
+  "failure": ""
+}

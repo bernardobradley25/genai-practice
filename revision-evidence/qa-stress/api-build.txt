@@ -11,4 +11,4 @@ $ node ./build.mjs
   dist/pino-pretty.mjs.map           209.5kb
   dist/thread-stream-worker.mjs.map   12.0kb
 
-⚡ Done in 204ms
+⚡ Done in 123ms

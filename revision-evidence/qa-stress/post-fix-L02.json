@@ -1,0 +1,33 @@
+{
+  "id": "L02",
+  "name": "Protect a different session",
+  "expected": {
+    "id": "sat",
+    "time": "10:00 AM"
+  },
+  "turns": [
+    {
+      "prompt": "Do not change Monday. Move Saturday’s run to 10:00 AM Saturday, keeping its duration and all other sessions.",
+      "status": 200,
+      "ms": 2077,
+      "text": "",
+      "proposal": {
+        "impact": "Saturday’s long easy run shifts one hour later, with its 60-minute relaxed duration unchanged. Monday and every other session stay as currently planned.",
+        "changes": [
+          {
+            "sport": "Run",
+            "day": "Saturday",
+            "time": "10:00 AM",
+            "title": "Long easy run",
+            "detail": "60 min · relaxed",
+            "status": "moved",
+            "sessionId": "sat"
+          }
+        ]
+      },
+      "errors": []
+    }
+  ],
+  "pass": true,
+  "failure": ""
+}

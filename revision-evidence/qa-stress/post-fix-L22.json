@@ -1,0 +1,55 @@
+{
+  "id": "L22",
+  "name": "Mixed rejection and new request",
+  "expected": {
+    "id": "fri",
+    "time": "6:00 PM",
+    "only": "fri"
+  },
+  "turns": [
+    {
+      "prompt": "Move Saturday’s run to 10 AM, same duration.",
+      "status": 200,
+      "ms": 1935,
+      "text": "",
+      "proposal": {
+        "impact": "Saturday’s long easy run stays 60 minutes and simply starts one hour later; no other sessions change.",
+        "changes": [
+          {
+            "sport": "Run",
+            "day": "Saturday",
+            "time": "10:00 AM",
+            "title": "Long easy run",
+            "detail": "60 min · relaxed",
+            "status": "moved",
+            "sessionId": "sat"
+          }
+        ]
+      },
+      "errors": []
+    },
+    {
+      "prompt": "No, keep Saturday at 9 AM. Instead move Friday strength to Friday 6 PM, same 40 minutes. Prepare only that.",
+      "status": 200,
+      "ms": 1977,
+      "text": "",
+      "proposal": {
+        "impact": "Saturday’s long easy run remains at 9:00 AM. Friday strength moves 30 minutes later, with the same 40-minute moderate session; it does not overlap another scheduled activity.",
+        "changes": [
+          {
+            "sport": "Strength",
+            "day": "Friday",
+            "time": "6:00 PM",
+            "title": "Strength + mobility",
+            "detail": "40 min · moderate",
+            "status": "moved",
+            "sessionId": "fri"
+          }
+        ]
+      },
+      "errors": []
+    }
+  ],
+  "pass": true,
+  "failure": ""
+}

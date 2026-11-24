@@ -1,0 +1,25 @@
+{
+  "id": "L05",
+  "name": "Negative recommendation acknowledgment",
+  "expected": {
+    "none": true
+  },
+  "turns": [
+    {
+      "prompt": "What if I move Thursday to Sunday? Just discuss the options.",
+      "status": 200,
+      "ms": 3348,
+      "text": "Moving the **Thursday 40-minute steady run** to **Sunday** is workable, but it puts it the day after Saturday’s 60-minute long easy run.\n\nOptions:\n\n1. **Move it unchanged to Sunday**\n   - Keeps the planned steady stimulus.\n   - Trade-off: back-to-back running may make Sunday feel heavier and reduce recovery.\n\n2. **Move a shortened easy version to Sunday**\n   - For example, about **20 minutes easy/conversational** rather than 40 minutes steady.\n   - Preserves some running rhythm while being more compatible with Saturday’s long run.\n\n3. **Leave Thursday as planned and keep Sunday as recovery**\n   - Best separation between soccer, the steady run, and the long run.\n   - Probably the most recovery-friendly setup.\n\nMy recommendation: if Thursday truly needs to move, make Sunday a **short easy run rather than a steady 40 minutes**, and keep Saturday relaxed. This protects the long run better than stacking two substantive runs. Do you like that plan?",
+      "errors": []
+    },
+    {
+      "prompt": "Yes, that sounds good, but I have not decided. Do not prepare anything.",
+      "status": 200,
+      "ms": 1903,
+      "text": "Absolutely—nothing will be changed or prepared.\n\nFor now, the tentative idea is: **if** Thursday moves to Sunday, make Sunday a short easy conversational run (around 20 minutes) rather than the full 40-minute steady workout, following Saturday’s relaxed long run.",
+      "errors": []
+    }
+  ],
+  "pass": true,
+  "failure": ""
+}

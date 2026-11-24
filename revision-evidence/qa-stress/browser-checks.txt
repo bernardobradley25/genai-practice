@@ -1,0 +1,12 @@
+Local browser QA — November 23, 2026
+Browser: Chrome. Real built frontend and API; scripted upstream AI, no paid model calls.
+B01 PASS Truncated tool response: shows recoverable error, preserves the submitted draft, exposes no review card, leaves the week unchanged.
+B02 PASS Retry after failure: a fresh swim request succeeds and produces the expected review card.
+B03 PASS Competing proposals: stage swim and strength separately, apply swim; the older strength card becomes disabled with an outdated-week explanation.
+B04 PASS New chat: clears messages and proposals while retaining the applied swim calendar and Undo.
+B05 PASS Stop: cancels a slow request immediately, keeps the editable draft and existing calendar, and does not resubmit.
+B06 PASS Reset during an active slow reply: cancels the reply, clears the conversation/draft, restores the initial week and removes Undo.
+B07 PASS Pasted HTML: <img src=x onerror=alert(1)> appears literally in the conversation. No injected image element and no JavaScript dialog.
+B08 PASS Long diary: nine consecutive 3,000-character user entries succeed without API history overflow. Raw result: browser-long-history.json.
+
+These eight browser workflows are additional to the 40-case API/live baseline; they are not used to inflate the baseline failure percentage.

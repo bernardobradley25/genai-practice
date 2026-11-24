@@ -36,3 +36,10 @@ test('property sweep: interval edges across all start minutes enforce exact over
 test('hourly budget, idempotent releases and time-window rollover remain bounded',()=>{
  const budget=new ChatBudget(4,1000,2);const a=budget.acquire(1000),b=budget.acquire(1000);assert.ok(a.ok&&b.ok);assert.equal(budget.acquire(1000).ok,false);a.release();a.release();const c=budget.acquire(1000);assert.ok(c.ok);b.release();c.release();const d=budget.acquire(1000);assert.ok(d.ok);d.release();assert.equal(budget.acquire(1000).ok,false);assert.equal(budget.acquire(2000).ok,true);
 });
+
+test('clock clarification continues prior direct intent but never earlier exploration',()=>{
+ const assistant={role:'assistant',content:'Do you mean AM or PM for that start time?'};
+ const answer={role:'user',content:'7 PM please, same Saturday and same 60 minutes.'};
+ assert.equal(hasClearReflowIntent([{role:'user',content:'Move Saturday to 7. Keep its duration. Prepare it.'},assistant,answer]),true);
+ assert.equal(hasClearReflowIntent([{role:'user',content:'What if Saturday were at 7?'},assistant,answer]),false);
+});
