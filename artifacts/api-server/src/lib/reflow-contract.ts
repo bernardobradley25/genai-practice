@@ -8,6 +8,23 @@ export function hasClearReflowIntent(messages: Array<{ role: string; content: st
   if (!text || /\b(maybe|perhaps|not sure|what if|i wonder|wait|hold on|not yet|hold off|before i decide|still deciding|not decided|unless)\b/.test(text)
     || /\bno\s+(?:proposal|changes?|edits?)\b/.test(text)
     || /\b(?:do not|don't|never)\s+(?:prepare|stage|reflow)\b/.test(text)) return false;
+  const previous = messages.slice(0, -1).reverse().find(message => message.role === 'assistant')?.content ?? '';
+  // A settled choice is permission to REVIEW, not apply. Resolve it only against
+  // the preceding coach response so old options cannot answer a new question.
+  const choice = text.match(/^(?:(?:i choose|i pick|i select|i(?:'ll| will) take|i(?:'m| am) settled on|(?:let's )?go with|let's take|take)\s+)?(?:the\s+)?(?:(?:option|number)\s+)?(\d+|one|two|three|four|five|first|second|third|fourth|fifth)(?:\s+(?:one|option))?(?:\s+(?:then|please))?[.!]?$/);
+  if (choice) {
+    const words: Record<string, number> = { one: 1, first: 1, two: 2, second: 2, three: 3, third: 3, four: 4, fourth: 4, five: 5, fifth: 5 };
+    const selected = words[choice[1]] ?? Number(choice[1]);
+    const plain = previous.replace(/[*_#]/g, '');
+    const offered = [...plain.matchAll(/\boption\s+(\d+)\b|^\s*(\d+)[.)]\s/gim)]
+      .map(match => Number(match[1] ?? match[2]));
+    const isTrainingPlan = /\b(?:run|soccer|swim|surf|strength|workout|session|training|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\b/i.test(plain)
+      && /\b(?:accept|keep|mark|move|replace|shorten|extend|skip|rest|cancel|recommend|plan)\b/i.test(plain);
+    return isTrainingPlan && offered.includes(selected);
+  }
+  // Qualified choices must not fall through to broad acknowledgment patterns.
+  if (/\b(?:option\s+(?:\d+|one|two|three|four|five)|(?:first|second|third|fourth|fifth)\s+(?:one|option))\b/.test(text)
+    && !/\b(?:prepare|stage|reflow|apply)\b/.test(text)) return false;
   const clauses = text.split(/[.;!?\n]|\b(?:and|but|instead)\b/);
   const edit = /\b(?:prepare|stage|reflow|reschedule|apply|make|update|change|move|replace|switch|add|shorten|extend|skip|mark|set|cancel|remove|cambia|cambiar|mueve|prepara|preparar)\b/;
   const direct = clauses.some(clause => !/\b(?:do not|don't|never|not to|no)\b/.test(clause)
@@ -15,10 +32,10 @@ export function hasClearReflowIntent(messages: Array<{ role: string; content: st
     && edit.test(clause));
   if (direct) return true;
 
-  const previous = messages.slice(0, -1).reverse().find(message => message.role === 'assistant')?.content ?? '';
   // Completing a requested clarification continues the earlier edit intent. It
   // does not promote an earlier hypothetical question into authorization.
-  const priorUser = messages.slice(0, -1).findLastIndex(message => message.role === 'user');
+  let priorUser = messages.length - 2;
+  while (priorUser >= 0 && messages[priorUser].role !== 'user') priorUser--;
   if (/\b(?:time|duration|am|pm|minutes|start)\b/i.test(previous) && previous.includes('?')
     && /\b(?:\d{1,2}(?::\d{2})?\s*(?:am|pm)|(?:[01]\d|2[0-3]):[0-5]\d|\d+\s*min(?:utes)?)\b/i.test(text)
     && priorUser >= 0 && hasClearReflowIntent(messages.slice(0, priorUser + 1))) return true;
